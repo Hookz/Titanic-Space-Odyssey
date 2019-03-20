@@ -81,7 +81,7 @@ public class MainSubScene extends Application {
 		SubScene mySub = new SubScene(root3D, 100, 100);
 		mySub.setFill(Color.LIGHTGREEN);
 		
-		/*//moving the camera -> but it firstly has to work
+		//moving the camera -> but it firstly has to work
 		mySub.setOnDragDetected((event) -> this.dragPosStart = new Vector3D(event.getX(), event.getY(), 0));
 		mySub.setOnMouseDragged((event) -> {
 			if (this.dragPosStart != null) {
@@ -93,7 +93,7 @@ public class MainSubScene extends Application {
 			}
 		});
 		mySub.setOnMouseReleased((event) -> this.dragPosStart = null);
-		*/
+		
 		
 		return mySub;
 		
