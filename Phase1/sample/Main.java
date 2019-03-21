@@ -265,7 +265,7 @@ public class Main extends Application {
     	fastForwardHalfButton.setFont(new Font("Serif", 16));
     	fastForwardHalfButton.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
-            	for (int i = 0; i < 7884; i++) {
+            	for (int i = 0; i < (60*60*24*365*0.5)/TIME_SLICE; i++) {
     				bodySystem.update(TIME_SLICE);
     				timeLabel.setText(bodySystem.getElapsedTimeAsString());
                     if (bodySystem.getSeconds() % (60*60*24*365) == 0) {
@@ -283,7 +283,7 @@ public class Main extends Application {
     	fastForwardYearButton.setFont(new Font("Serif", 16));
     	fastForwardYearButton.setOnAction(new EventHandler<ActionEvent>() {
     		public void handle(ActionEvent e) {
-    			for (int i = 0; i <47304; i++) {
+    			for (int i = 0; i <(60*60*24*365*3)/TIME_SLICE; i++) {
     				bodySystem.update(TIME_SLICE);
     				timeLabel.setText(bodySystem.getElapsedTimeAsString());
                     if (bodySystem.getSeconds() % (60*60*24*365) == 0) {
