@@ -83,7 +83,6 @@ public class Main extends Application {
         gc.clearRect(0, 0, canvasWidth, canvasHeight);
         gc.setFill(Color.LIGHTBLUE); //can be another color
         gc.fillRect(0, 0, canvasWidth, canvasHeight);
-
         for (Body body : bodySystem.getBodies()) {
 
 /*
@@ -94,17 +93,19 @@ public class Main extends Application {
 
             double otherX = transformer.modelToOtherX(body.location.x);
             double otherY = transformer.modelToOtherY(body.location.y);
+
             double BODY_RADIUS = Math.sqrt((body.getRadius()/4E+6)/(2*transformer.getScale()/6.0E9));
             // draw object circle
+
             gc.setFill(Color.BLACK);
             gc.fillOval(otherX - BODY_RADIUS, otherY - BODY_RADIUS, BODY_RADIUS * 2, BODY_RADIUS * 2);
 
-            // draw eliptical path
+            // draw elliptical path
 
 
             // draw label
             Text text = new Text(body.name);
-            gc.fillText(body.name, otherX - (text.getLayoutBounds().getWidth() / 2), otherY - BODY_RADIUS_GUI - (text.getLayoutBounds().getHeight() / 2));
+            gc.fillText(body.name, otherX - (text.getLayoutBounds().getWidth() / 2), otherY - BODY_RADIUS - (text.getLayoutBounds().getHeight() / 2));
         }
          
         if (!paused) {
@@ -238,7 +239,7 @@ public class Main extends Application {
     	fastForwardHalfButton.setFont(new Font("Serif", 16));
     	fastForwardHalfButton.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
-            	for (int i = 0; i < 78840; i++) {
+            	for (int i = 0; i < 7884; i++) {
     				bodySystem.update(TIME_SLICE);
     				timeLabel.setText(bodySystem.getElapsedTimeAsString());
     			}
@@ -252,7 +253,7 @@ public class Main extends Application {
     	fastForwardYearButton.setFont(new Font("Serif", 16));
     	fastForwardYearButton.setOnAction(new EventHandler<ActionEvent>() {
     		public void handle(ActionEvent e) {
-    			for (int i = 0; i <473040; i++) {
+    			for (int i = 0; i <47304; i++) {
     				bodySystem.update(TIME_SLICE);
     				timeLabel.setText(bodySystem.getElapsedTimeAsString());
     			}
