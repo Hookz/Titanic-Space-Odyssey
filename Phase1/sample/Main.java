@@ -26,6 +26,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.scene.control.Button;
 import javafx.scene.text.Font;
+import java.util.ArrayList;
 
 public class Main extends Application {
     //second to update the model(deltaT)
