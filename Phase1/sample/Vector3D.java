@@ -101,5 +101,9 @@ public class Vector3D {
         return String.format("x = %f, y = %f, z = %f", x, y, z);
     }
 
+    public Vector3D copy() {
+    	Vector3D copy = new Vector3D(this.x, this.y, this.z);
+    	return copy;
+    }
 
 }
