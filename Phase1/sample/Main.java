@@ -55,7 +55,11 @@ public class Main extends Application {
     private Button fastForwardYearButton;
     private Button fastForwardHalfButton;
     private boolean paused = true;
-
+    private ArrayList<BodySystem> oldSystems = new ArrayList<>();
+    private int currentSystem = 0;
+    private Button playBackButton;
+    private boolean change = false;
+    
     @Override
     public void start(Stage stage) {
         createBodies();
@@ -83,6 +87,21 @@ public class Main extends Application {
         gc.clearRect(0, 0, canvasWidth, canvasHeight);
         gc.setFill(Color.LIGHTBLUE); //can be another color
         gc.fillRect(0, 0, canvasWidth, canvasHeight);
+        
+        if (change) {
+        	if (currentSystem>0) {	
+        		int tryFor = bodySystem.getBodies().size();
+        		bodySystem.getBodies().clear();
+        		for (int i = 0; i <tryFor; i++) {
+        			bodySystem.getBodies().add(oldSystems.get(currentSystem-1).getBodies().get(i).copy());
+        			bodySystem.setSeconds(oldSystems.get(currentSystem-1).getSeconds());
+        			timeLabel.setText(bodySystem.getElapsedTimeAsString());
+        		}
+        		currentSystem--;
+        	}
+        	change = false;
+        }
+        
         for (Body body : bodySystem.getBodies()) {
 
 /*
@@ -111,6 +130,10 @@ public class Main extends Application {
         if (!paused) {
             bodySystem.update(TIME_SLICE);
             timeLabel.setText(bodySystem.getElapsedTimeAsString());
+            if(bodySystem.getSeconds()% (60*60*24*365) == 0) {//every year
+            	oldSystems.add(bodySystem.copy());
+            	currentSystem++;
+            }
         }
         fpsLabel.setText("FPS: " + fps.countFrame());
         scaleLabel.setText(String.format("Scale: %d km/pixel", Math.round(transformer.getScale()/1000)));
@@ -177,12 +200,14 @@ public class Main extends Application {
         createPauseButton();
         createFastForwardHalfButton();
         createFastForwardYearButton();
+        createPlayBackButton();
         
         buttons.setPadding(new Insets(10, 10, 10, 10));
         buttons.setSpacing(5);
         buttons.setStyle("-fx-background-color: #336699;");
         buttons.setFillHeight(true);
         
+        buttons.getChildren().add(playBackButton);
         buttons.getChildren().add(pauseButton);
         buttons.getChildren().add(fastForwardHalfButton);
         buttons.getChildren().add(fastForwardYearButton);
@@ -242,6 +267,10 @@ public class Main extends Application {
             	for (int i = 0; i < 7884; i++) {
     				bodySystem.update(TIME_SLICE);
     				timeLabel.setText(bodySystem.getElapsedTimeAsString());
+                    if (bodySystem.getSeconds() % (60*60*24*365) == 0) {
+    	            	oldSystems.add(bodySystem.copy());
+    	            	currentSystem++;
+    	            }
     			}
             }
         });
@@ -256,7 +285,22 @@ public class Main extends Application {
     			for (int i = 0; i <47304; i++) {
     				bodySystem.update(TIME_SLICE);
     				timeLabel.setText(bodySystem.getElapsedTimeAsString());
+                    if (bodySystem.getSeconds() % (60*60*24*365) == 0) {
+    	            	oldSystems.add(bodySystem.copy());
+    	            	currentSystem++;
+    	            }
     			}
+    		}
+    	});
+    }
+    
+    private void createPlayBackButton() {
+    	playBackButton = new Button();
+    	playBackButton.setText("Rewind 1 year");
+    	playBackButton.setFont(new Font("Serif", 16));
+    	playBackButton.setOnAction(new EventHandler<ActionEvent>() {
+    		public void handle(ActionEvent e) {
+    			change = true;
     		}
     	});
     }
