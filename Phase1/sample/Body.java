@@ -119,4 +119,16 @@ public class Body {
         buf.append(String.format("acc_x = %f, acc_y = %f, acc_z = %f", acceleration.x, acceleration.y, acceleration.z)).append('\n');
         return buf.toString();
     }
+    
+    public Body copy() {
+    	Body copy = new Body();
+    	copy.location = this.location.copy();
+        copy.velocity = this.velocity.copy();
+        copy.acceleration = this.acceleration.copy();
+        copy.mass = this.mass;
+        copy.radius = this.radius;
+        copy.name = this.name;
+        copy.acceleration = this.acceleration.copy();
+        return copy;
+    }
 }
