@@ -56,5 +56,22 @@ public class BodySystem {
         long seconds = ( ((elapsedSeconds % SEC_IN_YEAR) % SEC_IN_DAY) % SEC_IN_HOUR) % SEC_IN_MINUTE;
         return String.format("Years:%08d, Days:%03d, Hours:%02d, Minutes:%02d, Seconds:%02d", years, days, hours, minutes, seconds);
     }
+    
+    public BodySystem copy() {
+    	BodySystem copy = new BodySystem();
+    	copy.elapsedSeconds = this.elapsedSeconds;
+    	for (int i = 0; i < this.bodies.size(); i++) {
+    		copy.bodies.add(this.bodies.get(i).copy());
+    	}
+    	return copy;
+    }
+    
+    public long getSeconds() {
+    	return elapsedSeconds;
+    }
+
+    public void setSeconds(long seconds) {
+    	this.elapsedSeconds = seconds;
+    }
 
 }
