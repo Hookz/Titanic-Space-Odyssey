@@ -6,7 +6,7 @@ import static sample.SpaceObject.*;
 
 public class SolarSystem extends BodySystem {
 
-    private static SpaceObject[] CELESTIAL_BODIES_IN_SYSTEM = new SpaceObject[] {SUN, MERCURY, VENUS, EARTH, MOON, MARS, JUPITER, SATURN, TITAN, URANUS, NEPTUNE, PLUTO};
+    private static SpaceObject[] CELESTIAL_BODIES_IN_SYSTEM = new SpaceObject[] {SUN, MERCURY, VENUS, EARTH, MOON, MARS,PHOBOS , JUPITER, SATURN, TITAN, URANUS, NEPTUNE, PLUTO};
 
 
     public SolarSystem() {
