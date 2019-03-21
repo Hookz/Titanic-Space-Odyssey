@@ -94,10 +94,10 @@ public class Main extends Application {
 
             double otherX = transformer.modelToOtherX(body.location.x);
             double otherY = transformer.modelToOtherY(body.location.y);
-
+            double BODY_RADIUS = Math.sqrt((body.getRadius()/4E+6)/(2*transformer.getScale()/6.0E9));
             // draw object circle
             gc.setFill(Color.BLACK);
-            gc.fillOval(otherX - BODY_RADIUS_GUI, otherY - BODY_RADIUS_GUI, BODY_RADIUS_GUI * 2, BODY_RADIUS_GUI * 2);
+            gc.fillOval(otherX - BODY_RADIUS, otherY - BODY_RADIUS, BODY_RADIUS * 2, BODY_RADIUS * 2);
 
             // draw eliptical path
 

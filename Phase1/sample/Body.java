@@ -34,6 +34,9 @@ public class Body {
         this.mass = mass;
     }
 
+    public double getRadius(){
+        return radius;
+    }
     public Vector3D getAcceleration() {
         return acceleration;
     }
