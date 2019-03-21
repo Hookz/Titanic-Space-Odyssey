@@ -25,6 +25,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.scene.control.Button;
+import javafx.scene.text.Font;
 
 public class Main extends Application {
     //second to update the model(deltaT)
@@ -51,6 +52,9 @@ public class Main extends Application {
     private Label fpsLabel;
     private Label scaleLabel;
     private Button pauseButton;
+    private Button fastForwardYearButton;
+    private Button fastForwardHalfButton;
+    private boolean paused = true;
 
     @Override
     public void start(Stage stage) {
@@ -100,9 +104,11 @@ public class Main extends Application {
             Text text = new Text(body.name);
             gc.fillText(body.name, otherX - (text.getLayoutBounds().getWidth() / 2), otherY - BODY_RADIUS_GUI - (text.getLayoutBounds().getHeight() / 2));
         }
-
-        bodySystem.update(TIME_SLICE);
-        timeLabel.setText(bodySystem.getElapsedTimeAsString());
+         
+        if (!paused) {
+            bodySystem.update(TIME_SLICE);
+            timeLabel.setText(bodySystem.getElapsedTimeAsString());
+        }
         fpsLabel.setText("FPS: " + fps.countFrame());
         scaleLabel.setText(String.format("Scale: %d km/pixel", Math.round(transformer.getScale()/1000)));
     }
@@ -118,6 +124,9 @@ public class Main extends Application {
         createScaleLabel();
         HBox hbox = createHBox();
         border.setBottom(hbox);
+        HBox top = createHBoxTwo();
+        border.setTop(top);
+        
         Canvas canvas = createCanvas();
         border.setCenter(canvas);
         stage.setTitle("Solar System using N-Body");
@@ -127,7 +136,7 @@ public class Main extends Application {
 
         // Bind canvas size to stack pane size.
         canvas.widthProperty().bind(stage.widthProperty());
-        canvas.heightProperty().bind(stage.heightProperty().subtract(BOTTOM_AREA_HEIGHT));
+        canvas.heightProperty().bind(stage.heightProperty().subtract(BOTTOM_AREA_HEIGHT * 2));
         return canvas.getGraphicsContext2D();
     }
 
@@ -160,6 +169,21 @@ public class Main extends Application {
 
     private HBox createHBox() {
         HBox hbox = new HBox();
+        HBox buttons = new HBox();
+        
+        createPauseButton();
+        createFastForwardHalfButton();
+        createFastForwardYearButton();
+        
+        buttons.setPadding(new Insets(10, 10, 10, 10));
+        buttons.setSpacing(5);
+        buttons.setStyle("-fx-background-color: #336699;");
+        buttons.setFillHeight(true);
+        
+        buttons.getChildren().add(pauseButton);
+        buttons.getChildren().add(fastForwardHalfButton);
+        buttons.getChildren().add(fastForwardYearButton);
+        
         hbox.setPadding(new Insets(15, 12, 15, 12));
         hbox.setSpacing(10);   // Gap between nodes
         hbox.setStyle("-fx-background-color: #336699;");
@@ -167,26 +191,92 @@ public class Main extends Application {
         hbox.getChildren().add(this.timeLabel);
         hbox.getChildren().add(this.fpsLabel);
         hbox.getChildren().add(this.scaleLabel);
+        hbox.getChildren().add(buttons);
         return hbox;
     }
 
+    private HBox createHBoxTwo() {
+    	HBox hbox = new HBox();
+    	
+    	Label title = new Label();
+    	title.setText("Model of the Solar System");
+    	title.setFont(new Font("Serif", 40));
+    	title.setTextFill(Color.WHITE);
+    	
+    	hbox.getChildren().add(title);
+    	hbox.setPadding(new Insets(15, 12, 15, 12));
+        hbox.setSpacing(10);
+        hbox.setStyle("-fx-background-color: #336699;");
+        hbox.setFillHeight(true);
+    	return hbox;
+    }
+    
+    private void createPauseButton() {
+    	pauseButton = new Button();
+    	pauseButton.setText("Play");
+    	pauseButton.setFont(new Font("Serif", 16));
+    	pauseButton.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                if (paused) {
+                	paused = false;
+                	pauseButton.setText("Pause");
+                }
+                else {
+                	paused = true;
+                	pauseButton.setText("Play");
+                }
+            }
+        });
+    	
+    }
+    
+    private void createFastForwardHalfButton() {
+    	fastForwardHalfButton = new Button();
+    	fastForwardHalfButton.setText("Skip 1/2 year");
+    	fastForwardHalfButton.setFont(new Font("Serif", 16));
+    	fastForwardHalfButton.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+            	for (int i = 0; i < 78840; i++) {
+    				bodySystem.update(TIME_SLICE);
+    				timeLabel.setText(bodySystem.getElapsedTimeAsString());
+    			}
+            }
+        });
+    }
+    
+    private void createFastForwardYearButton() {
+    	fastForwardYearButton = new Button();
+    	fastForwardYearButton.setText("Skip 3 years");
+    	fastForwardYearButton.setFont(new Font("Serif", 16));
+    	fastForwardYearButton.setOnAction(new EventHandler<ActionEvent>() {
+    		public void handle(ActionEvent e) {
+    			for (int i = 0; i <473040; i++) {
+    				bodySystem.update(TIME_SLICE);
+    				timeLabel.setText(bodySystem.getElapsedTimeAsString());
+    			}
+    		}
+    	});
+    }
+    
     private void createTimeLabel() {
         timeLabel = new Label();
         timeLabel.setPrefSize(500, 20);
+        timeLabel.setFont(new Font("Serif", 16));
+        timeLabel.setTextFill(Color.WHITE);
     }
 
     private void createFPSLabel() {
         fpsLabel = new Label();
         fpsLabel.setPrefSize(100, 20);
+        fpsLabel.setFont(new Font("Serif", 16));
+        fpsLabel.setTextFill(Color.WHITE);
     }
 
     private void createScaleLabel() {
         scaleLabel = new Label();
         scaleLabel.setPrefSize(300, 20);
-    }
-
-    private void createPauseButton(){
-        pauseButton = new Button("Pause the Universe");
+        scaleLabel.setFont(new Font("Serif", 16));
+        scaleLabel.setTextFill(Color.WHITE);
     }
 
     public static void main(String[] args) {
