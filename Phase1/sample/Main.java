@@ -81,6 +81,8 @@ public class Main extends Application {
         this.canvasWidth = gc.getCanvas().getWidth();
         this.canvasHeight = gc.getCanvas().getHeight();
         gc.clearRect(0, 0, canvasWidth, canvasHeight);
+        gc.setFill(Color.LIGHTBLUE); //can be another color
+        gc.fillRect(0, 0, canvasWidth, canvasHeight);
 
         for (Body body : bodySystem.getBodies()) {
 
