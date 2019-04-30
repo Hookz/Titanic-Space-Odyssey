@@ -76,10 +76,6 @@ public class SpaceShip {
         return gravity;
     }
 
-    public static void main (String[] args) {
-    SpaceShip s = new SpaceShip(500,100,100);
-    System.out.println(s.getGravity());
-    }
 
     }
 
