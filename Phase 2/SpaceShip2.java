@@ -1,6 +1,5 @@
 package Land;
 
-import sample.Physics;
 
 public class SpaceShip2 {
 
@@ -15,6 +14,8 @@ public class SpaceShip2 {
     private double gravity;//acceleration of gravity
     private static final double massTitan = 1.3452E+23; //kg
     private static final double G = 6.67E-11;
+    private static final double g =  0.1352; // m /s^2
+    private static final double maxAcc = 9.6;
     
     
     private double tilt; //radians
@@ -87,8 +88,13 @@ public class SpaceShip2 {
     
     //use the mass and distance to titan to calculate the acceleration
     public void addAccelerationByGravityForce() {
-    	Vector2D grav = new Vector2D(0, this.getGravity());
+    	//Vector2D grav = new Vector2D(0, this.getGravity());
+    	Vector2D grav = new Vector2D(0, g * mass); //the force
     	addAccelerationByForce(grav);
+    }
+    
+    public void addAirResistance() {
+    	
     }
     
   //add a force vector on a body
@@ -118,6 +124,9 @@ public class SpaceShip2 {
     //calculates the last of the accumilated velocity.
     protected void updateVelocity(double timeSlice) {
         Vector2D velocityByAcc = new Vector2D(acceleration).mul(timeSlice);
+        if (velocity.y > maxAcc) {
+        	velocity.y = maxAcc;
+        }
         velocity.add(velocityByAcc);
     }
 
@@ -125,12 +134,6 @@ public class SpaceShip2 {
     protected void updateLocation(double timeSlice, Vector2D averageVelocity) {
         Vector2D locationByVelocity = new Vector2D(averageVelocity).mul(timeSlice);
         location.add(locationByVelocity);
-    }
-
-    public double getGravity() {
-        double metersToSurface = getLocation().y *  1000;
-        gravity = (getMass()*massTitan*G)/(metersToSurface*metersToSurface);
-        return gravity;
     }
     
     public SpaceShip2 copy() {
