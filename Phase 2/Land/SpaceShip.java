@@ -1,3 +1,4 @@
+package Land;
 public class SpaceShip extends Wind {
 
     private double mass; //kg

@@ -1,3 +1,4 @@
+package Land;
 public class Wind {
 
     private double wind; //km/s
