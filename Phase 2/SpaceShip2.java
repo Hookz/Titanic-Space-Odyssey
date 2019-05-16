@@ -10,20 +10,21 @@ public class SpaceShip2 {
     private double length;
     private double width;
     
-    //distance to titan is the yAxis in the location vector
-    private double gravity;//acceleration of gravity
-    private static final double massTitan = 1.3452E+23; //kg
-    private static final double G = 6.67E-11;
-    private static final double g =  0.1352; // m /s^2
+    //distance to titan is the y in the location vector
+    //private static final double massTitan = 1.3452E+23; //kg
+    ///private static final double G = 6.67E-11;
+    private static final double g =  1.352; // m /s^2
     private static final double maxAcc = 9.6;
+    private static final double dragCo = 0.10; //assuming it's streamlined, it's an estimate
+    private static final double density = 1.23995416; //density of Titan's atmosphere, kg / m^3
     
     
     private double tilt; //radians
-    private double angularVelocity; // rad/s
-    private static final double spinTolerance = 0.02; //radians/s
-    private static final double tiltTolerance = 0.01; //rad
-    private static final double landingXTolerance = 0.01; //m/s
-    //TODO add ytolerance
+    private double angularVelocity = 0; // rad/s
+    protected static final double spinTolerance = 0.02; //radians/s
+    protected static final double tiltTolerance = 0.01; //rad
+    protected static final double landingXTolerance = 0.01; //m/s
+    protected static final double landingYTolerance = 0.01; //m/s (for now)
 
     //constructors
     public SpaceShip2() {
@@ -70,6 +71,7 @@ public class SpaceShip2 {
     public Vector2D getVelocity() {
         return velocity;
     }
+    
     public void setLocation(Vector2D loc) {
         location = loc;
     }
@@ -86,6 +88,22 @@ public class SpaceShip2 {
         return tilt;
     }
     
+    public void setLength(double length) {
+		this.length = length;
+	}
+    
+	public double getLength() {
+		return length;
+	}
+
+	public void setWidth(double width) {
+		this.width = width;
+	}
+
+	public double getWidth() {
+		return width;
+	}	
+    
     //use the mass and distance to titan to calculate the acceleration
     public void addAccelerationByGravityForce() {
     	//Vector2D grav = new Vector2D(0, this.getGravity());
@@ -94,6 +112,11 @@ public class SpaceShip2 {
     }
     
     public void addAirResistance() {
+    	//without using tilt or anything
+    	double resisX = 0.5 * dragCo * density * (this.length * this.width) * this.velocity.x;
+    	double resisY = 0.5 * dragCo * density * (this.width * this.width) * this.velocity.y;
+    	Vector2D resistance = new Vector2D(-resisX, -resisY);
+    	addAccelerationByForce(resistance);
     	
     }
     
@@ -149,20 +172,12 @@ public class SpaceShip2 {
     
     }
 
-	public double getLength() {
-		return length;
+	public double getAngularVelocity() {
+		return angularVelocity;
 	}
 
-	public void setLength(double length) {
-		this.length = length;
-	}
-
-	public double getWidth() {
-		return width;
-	}
-
-	public void setWidth(double width) {
-		this.width = width;
+	public void setAngularVelocity(double angularVelocity) {
+		this.angularVelocity = angularVelocity;
 	}
     
 
