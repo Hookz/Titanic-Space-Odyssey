@@ -102,7 +102,7 @@ public class Main2 extends Application {
         	}
         }
         
-        // when y < 0, then stop -> it has hit titan
+        // when yAxis < 0, then stop -> it has hit titan
         
         if (change) {//to rewind - using the rewind buttons
         	if (currentSpaceShip>0) {	
@@ -131,8 +131,8 @@ public class Main2 extends Application {
             }
         }
         fpsLabel.setText("FPS: " + fps.countFrame());
-        velocityLabelX.setText("Velocity x =" + spaceShip.getVelocity().x);
-        velocityLabelY.setText("Velocity y = " + spaceShip.getVelocity().y);
+        velocityLabelX.setText("Velocity xAxis =" + spaceShip.getVelocity().x);
+        velocityLabelY.setText("Velocity yAxis = " + spaceShip.getVelocity().y);
     }
     
     private void createSpaceship() {
@@ -353,13 +353,13 @@ public class Main2 extends Application {
     	velocityLabelX.setPrefSize(300, 20);
     	velocityLabelX.setFont(new Font("Serif", 16));
     	velocityLabelX.setTextFill(Color.BLACK);
-    	velocityLabelX.setText("Velocity x");
+    	velocityLabelX.setText("Velocity xAxis");
     	
     	velocityLabelY = new Label();
     	velocityLabelY.setPrefSize(300, 20);
     	velocityLabelY.setFont(new Font("Serif", 16));
     	velocityLabelY.setTextFill(Color.BLACK);
-    	velocityLabelY.setText("Velocity y");
+    	velocityLabelY.setText("Velocity yAxis");
     	
     }
     

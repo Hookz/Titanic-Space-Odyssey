@@ -89,7 +89,7 @@ public class Vector2D {
         if (this.y != 0 ) {
             yy = this.y*this.y;
         }
-        return xx + yy + zz;
+        return xx + yy;
     }
 
     public double length() {
@@ -107,7 +107,7 @@ public class Vector2D {
 
     @Override
     public String toString() {
-        return String.format("x = %f, y = %f", x, y);
+        return String.format("xAxis = %f, yAxis = %f", x, y);
     }
 
 }

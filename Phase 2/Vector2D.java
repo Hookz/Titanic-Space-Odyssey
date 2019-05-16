@@ -81,7 +81,7 @@ public class Vector2D {
     }
 
     public String toString() {
-        return String.format("x = %f, y = %f, z = %f", x, y);
+        return String.format("xAxis = %f, yAxis = %f, z = %f", x, y);
     }
 
     public Vector2D copy() {

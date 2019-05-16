@@ -45,7 +45,7 @@ public class LinePrinter implements Printable {
 
                 // print the state array
                 if (printall) {
-                    // print all of the y array
+                    // print all of the yAxis array
                     for (int j = 0; j < y.length; j++) {
                         pw.print(y[j] + "\t");
                     }
@@ -56,7 +56,7 @@ public class LinePrinter implements Printable {
                                 .println("LinePrinter: too many elements to print");
                         return;
                     }
-                    // print the requested parts of the y array
+                    // print the requested parts of the yAxis array
                     for (int j = 0; j < indices.length; j++) {
                         pw.print(y[indices[j]] + "\t");
                     }

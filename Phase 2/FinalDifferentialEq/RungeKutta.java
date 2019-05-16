@@ -8,10 +8,10 @@ package FinalDifferentialEq;
 
 public class RungeKutta{
 
-    private double x0 = Double.NaN;                 // initial value of x
-    private double xn = Double.NaN;;                // final value of x
-    private double y0 = Double.NaN;                 // initial value of y; single ODE
-    private double[] yy0 = null;                    // initial values of y; multiple ODEs
+    private double x0 = Double.NaN;                 // initial value of xAxis
+    private double xn = Double.NaN;;                // final value of xAxis
+    private double y0 = Double.NaN;                 // initial value of yAxis; single ODE
+    private double[] yy0 = null;                    // initial values of yAxis; multiple ODEs
     private int nODE = 0;                           // number of ODEs
     private double step = Double.NaN;               // step size
 
@@ -81,9 +81,9 @@ public class RungeKutta{
 
     // Fourth order Runge-Kutta for a single ordinary differential equation
     public double fourthOrder(DerivFunction g){
-        if(Double.isNaN(this.x0))throw new IllegalArgumentException("No initial x value has been entered");
-        if(Double.isNaN(this.xn))throw new IllegalArgumentException("No final x value has been entered");
-        if(Double.isNaN(this.y0))throw new IllegalArgumentException("No initial y value has been entered");
+        if(Double.isNaN(this.x0))throw new IllegalArgumentException("No initial xAxis value has been entered");
+        if(Double.isNaN(this.xn))throw new IllegalArgumentException("No final xAxis value has been entered");
+        if(Double.isNaN(this.y0))throw new IllegalArgumentException("No initial yAxis value has been entered");
         if(Double.isNaN(this.step))throw new IllegalArgumentException("No step size has been entered");
 
         double  k1 = 0.0D, k2 = 0.0D, k3 = 0.0D, k4 = 0.0D;
@@ -124,9 +124,9 @@ public class RungeKutta{
 
     // Fourth order Runge-Kutta for n (nODE) ordinary differential equations (ODE)
     public double[] fourthOrder(DerivnFunction g){
-        if(Double.isNaN(this.x0))throw new IllegalArgumentException("No initial x value has been entered");
-        if(Double.isNaN(this.xn))throw new IllegalArgumentException("No final x value has been entered");
-        if(this.yy0==null)throw new IllegalArgumentException("No initial y values have been entered");
+        if(Double.isNaN(this.x0))throw new IllegalArgumentException("No initial xAxis value has been entered");
+        if(Double.isNaN(this.xn))throw new IllegalArgumentException("No final xAxis value has been entered");
+        if(this.yy0==null)throw new IllegalArgumentException("No initial yAxis values have been entered");
         if(Double.isNaN(this.step))throw new IllegalArgumentException("No step size has been entered");
 
         double[] k1 =new double[this.nODE];

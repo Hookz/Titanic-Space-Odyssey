@@ -107,7 +107,7 @@ public class Main extends Application {
 
 /*
             System.out.println(body.toString());
-            System.out.println("px:" + transformer.modelToOtherX(body.location.x) + ", py:" + transformer.modelToOtherY(body.location.y));
+            System.out.println("px:" + transformer.modelToOtherX(body.location.xAxis) + ", py:" + transformer.modelToOtherY(body.location.yAxis));
             System.out.println();
 */
 

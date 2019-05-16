@@ -88,8 +88,8 @@ public class MainSubScene extends Application {
 				Vector3D dragPosCurrent = new Vector3D(event.getX(), event.getY(), 0);
 				dragPosCurrent.sub(this.dragPosStart);
 				dragPosStart = new Vector3D(event.getX(), event.getY(), 0);
-				camera.setTranslateX(dragPosCurrent.x);
-				camera.setTranslateY(dragPosCurrent.y);
+				camera.setTranslateX(dragPosCurrent.xAxis);
+				camera.setTranslateY(dragPosCurrent.yAxis);
 			}
 		});
 		mySub.setOnMouseReleased((event) -> this.dragPosStart = null);
@@ -105,8 +105,8 @@ public class MainSubScene extends Application {
 		
 		for (Body body : bodySystem.getBodies()) {
 
-			            double otherX = transformer.modelToOtherX(body.location.x);
-			            double otherY = transformer.modelToOtherY(body.location.y);
+			            double otherX = transformer.modelToOtherX(body.location.xAxis);
+			            double otherY = transformer.modelToOtherY(body.location.yAxis);
 
 			            // draw object sphere
 			            Sphere planet = new Sphere(body.radius / INITIAL_SCALE);

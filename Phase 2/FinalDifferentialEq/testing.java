@@ -13,13 +13,13 @@ public class testing {
         // Variable declarations
         int n = 3;                            // number of differential equations
         double h = 0.01;                      // step size
-        double x0 = 0.0D;                     // initial value of x
-        double xn = 1.0D;                     // final value of x
-        double[ ] y0 = new double[n];         // initial values of the y[i]
-        double[ ] yn = new double[n];         // returned value of the y[i] at x = xn
+        double x0 = 0.0D;                     // initial value of xAxis
+        double xn = 1.0D;                     // final value of xAxis
+        double[ ] y0 = new double[n];         // initial values of the yAxis[i]
+        double[ ] yn = new double[n];         // returned value of the yAxis[i] at xAxis = xn
 
 
-        // Assign initial values of y[i]
+        // Assign initial values of yAxis[i]
         y0[0] = 5.0D;
         y0[1] = 1.0D;
         y0[2] = 0.5D;
@@ -38,9 +38,9 @@ public class testing {
 
         // Output the results
         System.out.println("Fourth order Runge-Kutta procedure");
-        System.out.println("The value of y[0] at x = " + xn + " is " + yn[0]);
-        System.out.println("The value of y[1] at x = " + xn + " is " + yn[1]);
-        System.out.println("The value of y[2] at x = " + xn + " is " + yn[2]);
+        System.out.println("The value of yAxis[0] at xAxis = " + xn + " is " + yn[0]);
+        System.out.println("The value of yAxis[1] at xAxis = " + xn + " is " + yn[1]);
+        System.out.println("The value of yAxis[2] at xAxis = " + xn + " is " + yn[2]);
         System.out.println("Number of iterations = " + rk.getNumberOfIterations());
 
     }

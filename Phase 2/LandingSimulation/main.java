@@ -8,5 +8,7 @@ package LandingSimulation;
  * making everything visual in real time.
  */
 public class main {
-
+    public static void main(String arg[]) {
+        OpenLoop control = new
+    }
 }

@@ -297,7 +297,7 @@ public class TwoBody implements Derivatives
         }
     }
 
-    //get derivatives for integration of two body equations. (time t, state vector y)
+    //get derivatives for integration of two body equations. (time t, state vector yAxis)
     public double[] derivs(double t, double[] y)
     {
         double out[] = new double[6];

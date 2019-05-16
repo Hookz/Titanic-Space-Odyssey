@@ -15,7 +15,7 @@ public abstract class Tuple3d implements java.io.Serializable, Cloneable {
         this.z = (double) 0.0;
     }
 
-    //(x,y,z) coordinate
+    //(xAxis,yAxis,z) coordinate
     public final void set(double x, double y, double z)
     {
         this.x = x;
@@ -23,7 +23,7 @@ public abstract class Tuple3d implements java.io.Serializable, Cloneable {
         this.z = z;
     }
 
-    //(x,y,z) coordinate using arra
+    //(xAxis,yAxis,z) coordinate using arra
     public final void set(double[] t)
     {
         this.x = t[0];

@@ -31,12 +31,12 @@ public class CoordinatesTransformer {
         this.originYForOther = originYForOther;
     }
 
-    // x coordinate
+    // xAxis coordinate
     public double modelToOtherX(double x) {
         return this.originXForOther + getModelToOtherDistance(x);
     }
 
-    // y coordinate
+    // yAxis coordinate
     public double modelToOtherY(double y) {
         return this.originYForOther + getModelToOtherDistance(y);
     }

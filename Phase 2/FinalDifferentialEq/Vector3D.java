@@ -98,7 +98,7 @@ public class Vector3D {
 
     @Override
     public String toString() {
-        return String.format("x = %f, y = %f, z = %f", x, y, z);
+        return String.format("xAxis = %f, yAxis = %f, z = %f", x, y, z);
     }
 
 

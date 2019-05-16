@@ -17,7 +17,7 @@ public class ZeroFinder {
     //error counter
     private int err = 0;
 
-    //(function to be solved, max iterations, f(x) accuracy to 0, how many # before 0)
+    //(function to be solved, max iterations, f(xAxis) accuracy to 0, how many # before 0)
     public ZeroFinder(ScalarFunction f, int max, double acc, double dxm) {
         setMaxIterations(max);
         setAccuracy(acc);
@@ -37,7 +37,7 @@ public class ZeroFinder {
         this.dxmin = x;
     }
 
-    //using false position method.  Taking in lower and upper limits of x.
+    //using false position method.  Taking in lower and upper limits of xAxis.
     public double regulaFalsi(double x1, double x2) {
         double xlow;
         double xhigh;

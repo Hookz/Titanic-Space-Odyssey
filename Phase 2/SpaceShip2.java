@@ -10,7 +10,7 @@ public class SpaceShip2 {
     private double length;
     private double width;
     
-    //distance to titan is the y in the location vector
+    //distance to titan is the yAxis in the location vector
     private double gravity;//acceleration of gravity
     private static final double massTitan = 1.3452E+23; //kg
     private static final double G = 6.67E-11;

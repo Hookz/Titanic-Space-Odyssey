@@ -1,12 +1,12 @@
 //package FinalDifferentialEq;
 //
 //public class OpenLoopController {
-//    public double x;
-//    public double y;
+//    public double xAxis;
+//    public double yAxis;
 //
 //    public OpenLoopController(double startingX, double startingY) {
-//        this.x = startingX;
-//        this.y = startingY;
+//        this.xAxis = startingX;
+//        this.yAxis = startingY;
 //    }
 //
 //    public void controller(double v, double u){
