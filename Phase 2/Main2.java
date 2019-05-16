@@ -15,24 +15,19 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import sample.CoordinatesTransformer;
 import javafx.scene.control.Button;
 import javafx.scene.text.Font;
 
 public class Main2 extends Application {
+	
     //second to update the model(deltaT)
     public final double TIME_SLICE = 1;
 
-    public static final double SCALE = 2000;
-
-    public static final double BODY_RADIUS_GUI = 2;
-
     private static final int BOTTOM_AREA_HEIGHT = 100;
     
-    public static final double REAL_SCALE = 2.25 / 1000; //0.75 (on the screen) for 1 kilometer, although this is measured in meters
+    public static final double REAL_SCALE = 2.25 / 1000; //2.25(on the screen) for 1 kilometer, although this is measured in meters
 
     private FPSCounter fps = new FPSCounter();
 
@@ -50,7 +45,7 @@ public class Main2 extends Application {
     private boolean paused = true;
     private Button playBackButton;
     private boolean change = false;
-    private double spaceshipMass = 1000; // kg
+    private double spaceshipMass = 5000; // kg
     public MovingSpaceShip spaceShip;
     private Vector2D locLanding;
     
@@ -94,7 +89,7 @@ public class Main2 extends Application {
         	paused = true;
         	landingLabel.setText("Landed!");
         	pauseButton.setText("Play");
-        	if (spaceShip.getLocation().x < locLanding.x + 30 && spaceShip.getLocation().x > locLanding.x - 30) {
+        	if (spaceShip.getLocation().x < locLanding.x + 30 && spaceShip.getLocation().x > locLanding.x - 30 && spaceShip.landingSucceeded()) {
         		goalLabel.setText("Landing succeeded");
         	}
         	else {
@@ -107,6 +102,7 @@ public class Main2 extends Application {
         if (change) {//to rewind - using the rewind buttons
         	if (currentSpaceShip>0) {	
         		spaceShip = oldSpaceShips.get(oldSpaceShips.size()-1).copyMSS();
+        		gc.fillRect(spaceShip.getLocation().x * REAL_SCALE, spaceShip.getLocation().y * REAL_SCALE , spaceShip.getWidth(), spaceShip.getLength()); //width and height are not scaled
         		oldSpaceShips.remove(oldSpaceShips.size()-1);
         		spaceShip.setSeconds(oldSpaceShips.get(oldSpaceShips.size()-1).getSeconds());
         		timeLabel.setText(spaceShip.getElapsedTimeAsString());
@@ -117,7 +113,7 @@ public class Main2 extends Application {
         }
         
         for (MovingSpaceShip spaces : oldSpaceShips) {
-        gc.fillOval(spaces.getLocation().x * REAL_SCALE, spaces.getLocation().y * REAL_SCALE, 5, 5 );
+        gc.fillOval(spaces.getLocation().x * REAL_SCALE, spaces.getLocation().y * REAL_SCALE + 0.5 * spaceShip.getLength(), 5, 5 );
         }
         
         gc.fillRect(spaceShip.getLocation().x * REAL_SCALE, spaceShip.getLocation().y * REAL_SCALE , spaceShip.getWidth(), spaceShip.getLength());
@@ -125,7 +121,7 @@ public class Main2 extends Application {
         if (!paused) {//the normal updates
         	spaceShip.update(TIME_SLICE);
             timeLabel.setText(spaceShip.getElapsedTimeAsString());
-            if(spaceShip.getSeconds()% (60*20) == 0 && spaceShip.getSeconds() != 0) {//every 10 min, save a copy
+            if(spaceShip.getSeconds()% (60*20) == 0) {//every 10 min, save a copy
             	oldSpaceShips.add(spaceShip.copyMSS());
             	currentSpaceShip++;
             }
@@ -139,12 +135,12 @@ public class Main2 extends Application {
     	//arbitrary numbers:
     	Vector2D spaceshipLoc = new Vector2D(10, 20);
     	Vector2D spaceshipVeloc = new Vector2D(0, 0);
-    	double length = 20;
-    	double width = 10;
+    	double length = 17;
+    	double width = 4.5;
     	
     	spaceShip = new MovingSpaceShip(spaceshipMass, spaceshipLoc, spaceshipVeloc, length, width);
     	
-    	locLanding = new Vector2D(200, 550); //marks the desired landing site
+    	locLanding = new Vector2D(475, 550); //marks the desired landing site
     	
     }
 
@@ -267,7 +263,7 @@ public class Main2 extends Application {
                     	paused = true;
                     	landingLabel.setText("Landed!");
                     	pauseButton.setText("Play");
-                    	if (spaceShip.getLocation().x < locLanding.x + 10 && spaceShip.getLocation().x > locLanding.x - 10 && spaceShip.getLocation().y < locLanding.y + 10 && spaceShip.getLocation().y > locLanding.y - 10) {
+                    	if (spaceShip.getLocation().x < locLanding.x + 10 && spaceShip.getLocation().x > locLanding.x - 10 && spaceShip.landingSucceeded()) {
                     		goalLabel.setText("Landing succeeded");
                     	}
                     	else {
@@ -297,7 +293,7 @@ public class Main2 extends Application {
     		        	paused = true;
     		        	landingLabel.setText("Landed!");
     		        	pauseButton.setText("Play");
-    		        	if (spaceShip.getLocation().x < locLanding.x + 10 && spaceShip.getLocation().x > locLanding.x - 10 && spaceShip.getLocation().y < locLanding.y + 10 && spaceShip.getLocation().y > locLanding.y - 10) {
+    		        	if (spaceShip.getLocation().x < locLanding.x + 10 && spaceShip.getLocation().x > locLanding.x - 10 && spaceShip.landingSucceeded()) {
     		        		goalLabel.setText("Landing succeeded");
     		        	}
     		        	else {
