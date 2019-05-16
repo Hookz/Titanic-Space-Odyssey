@@ -26,8 +26,8 @@ public double update(double timeSlice) {
     this.addAccelerationByGravityForce(); //for now it's only the gravitational force - add wind and tilt when those classes are done
     
     //hardcoded for now
-    Vector2D wind = new Vector2D(300, 0);
-    Vector2D friction = new Vector2D(-100, -200); //can add the real air friction to this later
+    Vector2D wind = new Vector2D(0, 0);
+    Vector2D friction = new Vector2D(0, 0); //can add the real air friction to this later
     this.addAccelerationByForce(wind); 
     this.addAccelerationByForce(friction);
     

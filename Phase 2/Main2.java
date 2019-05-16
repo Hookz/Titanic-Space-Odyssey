@@ -24,7 +24,7 @@ import javafx.scene.text.Font;
 
 public class Main2 extends Application {
     //second to update the model(deltaT)
-    public final double TIME_SLICE = 0.1;
+    public final double TIME_SLICE = 1;
 
     public static final double SCALE = 2000;
 
@@ -32,7 +32,7 @@ public class Main2 extends Application {
 
     private static final int BOTTOM_AREA_HEIGHT = 100;
     
-    public static final double REAL_SCALE = 0.75 / 1000; //0.75 (on the screen) for 1 kilometer, although this is measured in meters
+    public static final double REAL_SCALE = 2.25 / 1000; //0.75 (on the screen) for 1 kilometer, although this is measured in meters
 
     private FPSCounter fps = new FPSCounter();
 
@@ -106,9 +106,9 @@ public class Main2 extends Application {
         
         if (change) {//to rewind - using the rewind buttons
         	if (currentSpaceShip>0) {	
-        		spaceShip = oldSpaceShips.get(currentSpaceShip-1).copyMSS();
-        		oldSpaceShips.remove(currentSpaceShip-1);
-        		spaceShip.setSeconds(oldSpaceShips.get(currentSpaceShip-1).getSeconds());
+        		spaceShip = oldSpaceShips.get(oldSpaceShips.size()-1).copyMSS();
+        		oldSpaceShips.remove(oldSpaceShips.size()-1);
+        		spaceShip.setSeconds(oldSpaceShips.get(oldSpaceShips.size()-1).getSeconds());
         		timeLabel.setText(spaceShip.getElapsedTimeAsString());
         		currentSpaceShip--;
         		landingLabel.setText("Landing...");
@@ -117,7 +117,7 @@ public class Main2 extends Application {
         }
         
         for (MovingSpaceShip spaces : oldSpaceShips) {
-        gc.fillOval(spaces.getLocation().x * REAL_SCALE, spaces.getLocation().y * REAL_SCALE, 1, 1 );
+        gc.fillOval(spaces.getLocation().x * REAL_SCALE, spaces.getLocation().y * REAL_SCALE, 5, 5 );
         }
         
         gc.fillRect(spaceShip.getLocation().x * REAL_SCALE, spaceShip.getLocation().y * REAL_SCALE , spaceShip.getWidth(), spaceShip.getLength());
@@ -125,7 +125,7 @@ public class Main2 extends Application {
         if (!paused) {//the normal updates
         	spaceShip.update(TIME_SLICE);
             timeLabel.setText(spaceShip.getElapsedTimeAsString());
-            if(spaceShip.getSeconds()% (60*5) == 0 && spaceShip.getSeconds() != 0) {//every 10 min, save a copy
+            if(spaceShip.getSeconds()% (60*20) == 0 && spaceShip.getSeconds() != 0) {//every 10 min, save a copy
             	oldSpaceShips.add(spaceShip.copyMSS());
             	currentSpaceShip++;
             }
@@ -138,7 +138,7 @@ public class Main2 extends Application {
     private void createSpaceship() {
     	//arbitrary numbers:
     	Vector2D spaceshipLoc = new Vector2D(10, 20);
-    	Vector2D spaceshipVeloc = new Vector2D(880, 0);
+    	Vector2D spaceshipVeloc = new Vector2D(0, 0);
     	double length = 20;
     	double width = 10;
     	
@@ -276,7 +276,7 @@ public class Main2 extends Application {
                     	break;
                     }
     				timeLabel.setText(spaceShip.getElapsedTimeAsString());
-                    if (spaceShip.getSeconds() % (60*5) == 0) {
+                    if (spaceShip.getSeconds() % (60*20) == 0) {
     	            	oldSpaceShips.add(spaceShip.copyMSS());
     	            	currentSpaceShip++;
     	            }
@@ -306,7 +306,7 @@ public class Main2 extends Application {
     		        	break;
     		        }
     				timeLabel.setText(spaceShip.getElapsedTimeAsString());
-                    if (spaceShip.getSeconds() % (60*5) == 0) {
+                    if (spaceShip.getSeconds() % (60*20) == 0) {
     	            	oldSpaceShips.add(spaceShip.copyMSS());
     	            	currentSpaceShip++;
     	            }
@@ -317,7 +317,7 @@ public class Main2 extends Application {
     
     private void createPlayBackButton() {
     	playBackButton = new Button();
-    	playBackButton.setText("Rewind 5 min");
+    	playBackButton.setText("Rewind 20 min");
     	playBackButton.setFont(new Font("Serif", 16));
     	playBackButton.setOnAction(new EventHandler<ActionEvent>() {
     		public void handle(ActionEvent e) {

@@ -1,4 +1,4 @@
-public class SpaceShip {
+public class SpaceShip extends Wind {
 
     private double mass; //kg
     private double xVelocity;//
@@ -7,9 +7,9 @@ public class SpaceShip {
     private double yLocation;//km
     private double gravity;//acceleration of gravity
     private static final double massTitan = 1.3452E+23; //kg
-    public static final double gravTitan = 1.352; //acceleration due to gravity on titan, in ms
+    public static final double gravTitan = 1.352; //acceleration due to gravity on titan, in ms^2
     private static final double G = 6.67E-11;
-    private double tilt; //radians
+    private double tilt = 0; //radians
     private double angularVelocity; // rad/s
     private static final double spinTolerance = 0.02; //radians/s
     private static final double tiltTolerance = 0.01; //rad
@@ -18,10 +18,12 @@ public class SpaceShip {
     private double yAcceleration;
     private double torque; //provided by the side thrusters
     private double rotationAcceleration;
+    private boolean landed = false;
     //TODO add ytolerance
 
 
     public SpaceShip(double mass, double xLocation, double yLocation) {
+        super();
         this.mass = mass;
         this.yLocation=yLocation;
         this.xLocation=xLocation;
@@ -67,8 +69,8 @@ public class SpaceShip {
         return yVelocity;
     }
 
-    public void setTilt(double tilt) {
-        this.tilt = tilt;
+    public void addTilt(double tilt) {
+        this.tilt = this.tilt + tilt;
     }
 
     public double getTilt() {
@@ -98,6 +100,11 @@ public class SpaceShip {
     }
     //By choosing realistic values for the power of the thrusters we can now calculate the acceleration
 
+    public static void main(String[] args){
+        SpaceShip s = new SpaceShip(5000, 0, 0);
+        System.out.println(s.calcDisplacement(s, 1));
+
+    }
 
 }
 
