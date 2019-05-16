@@ -99,12 +99,12 @@ public class SpaceShip extends Wind {
         return rotationAcceleration;
     }
     //By choosing realistic values for the power of the thrusters we can now calculate the acceleration
-/*
+
     public static void main(String[] args){
         SpaceShip s = new SpaceShip(5000, 0, 0);
         System.out.println(s.calcDisplacement(s, 1));
 
     }
-    */
+
 }
 
