@@ -74,38 +74,11 @@ public class Wind {
         relativeWindSpeed = s.getWind()-s.getXVelocity();
     }
 
-    public static void main(String[] args) {
-        SpaceShip s = new SpaceShip(5000, 0, 0);
-        s.calcWindSpeed(10);
-        s.calculateRelativeWindSpeed(s);
-        s.calculateForce(s);
-
-        System.out.println(s.getArea());
-        System.out.println(s.getAirDensity());
-        System.out.println(s.getRelativeWindSpeed());
-        System.out.println(s.getWind());
-        System.out.println(s.getXVelocity());
-        System.out.println(s.getForce());
-    }
-
     public double calcDisplacement(SpaceShip s, double kmtosurface){
         //System.out.println(accByWind(s, ));
         double displacement = s.getXVelocity()*TIME_SLICE + 0.5*(accByWind(s, kmtosurface)) * TIME_SLICE*TIME_SLICE;
         return displacement;
     }
-
-/*
-    public void normalWind(SpaceShip s){
-
-
-        //Determine direction
-        double d = Math.random();
-        if (d>=0.5){
-            tilt = -tilt;
-        }
-        s.addTilt(tilt);
-    }
-    */
 
     public double getWind() {
         return this.wind;
@@ -128,5 +101,29 @@ public class Wind {
 
     public double getForce() {
         return force;
+    }
+
+    public double calcTilt(SpaceShip s, double kmToSurface){
+        double randTilt = (Math.random()*10);
+        //Make zones, such that the further away from titan, the higher the tilt can be
+        if (kmToSurface<=24)
+            randTilt = randTilt;
+        else if (kmToSurface <= 48)
+            randTilt = 3* randTilt;
+        else if (kmToSurface <= 72)
+            randTilt = 4.5* randTilt;
+        else if (kmToSurface <= 96)
+            randTilt = 6* randTilt;
+        else
+            randTilt = 9* randTilt;
+
+        double tiltInRadians = Math.toRadians(randTilt);
+
+        if (s.getWind()<0)
+            s.addTilt(tiltInRadians);
+        else
+            s.addTilt(-tiltInRadians);
+
+        return tiltInRadians;
     }
 }
