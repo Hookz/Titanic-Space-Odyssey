@@ -4,17 +4,17 @@ package Land;
 public class SpaceShip2 {
 
     public double mass; //in kilograms
-    private Vector2D location;
-    private Vector2D velocity;
-    private Vector2D acceleration;
-    private double length;
-    private double width;
+    private Vector2D location; //in metres, at a certain point above titan. the zero point is where the rocket starts
+    private Vector2D velocity; //m/s
+    private Vector2D acceleration;// m/s^2
+    private double length; //m
+    private double width; //m
     
     //distance to titan is the y in the location vector
     //private static final double massTitan = 1.3452E+23; //kg
     ///private static final double G = 6.67E-11;
     private static final double g =  1.352; // m /s^2
-    private static final double maxAcc = 9.6;
+    private static final double maxAcc = 9.6; // m / s^2 ??? or m/s???
     private static final double dragCo = 0.10; //assuming it's streamlined, it's an estimate
     private static final double density = 1.23995416; //density of Titan's atmosphere, kg / m^3
     
