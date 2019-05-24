@@ -73,12 +73,12 @@ public class Wind {
     }
 
     public void calculateRelativeWindSpeed(SpaceShip s){
-        relativeWindSpeed = s.getWind()-s.getXVelocity();
+        relativeWindSpeed = s.getWind()-s.getVelocity().x;
     }
 
     //Call this method for the x displacement in METERS
     public double calcDisplacement(SpaceShip s, double kmtosurface){
-        double displacement = s.getXVelocity()*TIME_SLICE + 0.5*(accByWind(s, kmtosurface)) * TIME_SLICE*TIME_SLICE;
+        double displacement = s.getVelocity().y*TIME_SLICE + 0.5*(accByWind(s, kmtosurface)) * TIME_SLICE*TIME_SLICE;
         return displacement;
     }
 

@@ -1,4 +1,4 @@
-package ControlSystem;
+    package ControlSystem;
 
 public class OpenLoop {
     //change to long?
@@ -60,7 +60,7 @@ public class OpenLoop {
         return newt;
     }
 
-    //TODO: yDoubleDot is also a differntial equation.
+    //TODO: yDoubleDot is also a differential equation.
 
     /**
      *
