@@ -7,25 +7,29 @@ public class Wind {
     private double relativeWindSpeed;
     public double force;
     private double accByWind;
-    private static double TIME_SLICE=200; //in seconds
+    private static double TIME_SLICE=60; //in seconds
 
     public Wind(){
-
-        //wind = 0;
     }
+
     public void calcWindSpeed(double kmFromSurface) {
         //Linear formula based on two points we know (0,0.3) and (120,120), where x = km from surface and y = windspeed
+        //Calc windspeed based on function
         double windSpeed = (119.7 / 120) * kmFromSurface + 0.3;
+
+        //Since the maximum windspeed according to California institute for technology was 120 m/s, we cap it there
+        if (windSpeed>100) {
+            windSpeed = 100;
+        }
+
+        //Add a 20% difference, so we have a stochastic model
         double range = (1.2 - 0.8);
         double randWindSpeed = windSpeed * ((Math.random() * range) + 0.8);
 
         double direction = Math.random();
         //Make it unlikely for the wind direction to change, otherwise it changes way too often (depending on how often
         //the wind speed is calculated
-        //System.out.println(getWind());
-        System.out.println("The old windspeed was: " + wind);
-        System.out.println("The random wind is: " + randWindSpeed);
-        System.out.println("The direction is: " + direction);
+
         if (wind == 0 && direction >=0.5) {
             randWindSpeed = -randWindSpeed;
             wind = randWindSpeed;
@@ -50,16 +54,13 @@ public class Wind {
         else if (wind > 0 && direction<0.8){
             wind = randWindSpeed;
         }
-        System.out.println("The new windspeed is: " + wind);
-        System.out.println(" ");
-
+    //For now, we put a limit on the maximum wind speed, since
     }
 
     public double accByWind(SpaceShip s, double kmtosurface){
         calcWindSpeed(kmtosurface);
         calculateForce(s);
         accByWind = s.force/s.getMass();
-        System.out.println(s.getAccByWind());
         return accByWind;
     }
 
@@ -75,8 +76,8 @@ public class Wind {
         relativeWindSpeed = s.getWind()-s.getXVelocity();
     }
 
+    //Call this method for the x displacement in METERS
     public double calcDisplacement(SpaceShip s, double kmtosurface){
-        //System.out.println(accByWind(s, ));
         double displacement = s.getXVelocity()*TIME_SLICE + 0.5*(accByWind(s, kmtosurface)) * TIME_SLICE*TIME_SLICE;
         return displacement;
     }
@@ -104,6 +105,8 @@ public class Wind {
         return force;
     }
 
+    //Call this method to get the tilt in radians (positive wind is negative tilt)
+    //this method adjusts tilt in SpaceShip class
     public double calcTilt(SpaceShip s, double kmToSurface){
         double randTilt = (Math.random()*10);
         //Make zones, such that the further away from titan, the higher the tilt can be
@@ -127,4 +130,12 @@ public class Wind {
 
         return tiltInRadians;
     }
+
+    /*
+    public static void main (String [] args){
+        SpaceShip s = new SpaceShip(5000,0,0);
+        System.out.println(s.calcDisplacement(s, 400));
+        System.out.print(s.getWind());
+    }
+    */
 }
