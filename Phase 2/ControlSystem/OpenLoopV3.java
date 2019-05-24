@@ -7,7 +7,6 @@ public class OpenLoopV3 {
 //        Vector3D velocity = new Vector3D(0,0,0);
         Vector2D thruster = new Vector2D(0,0); //x is u, y is v
         Wind wind = new Wind();
-        final double TIME_STEP = 0.1;
         double timePassed = 0;
 
 //        spaceShip.setMass(5000);
@@ -85,7 +84,7 @@ public class OpenLoopV3 {
 
 
 //            //update
-            timePassed += TIME_STEP;
+            timePassed += spaceShip.TIME_SLICE;
 
         }
 

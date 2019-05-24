@@ -1,5 +1,7 @@
 package ControlSystem;
 
+import java.sql.Time;
+
 public class SpaceShip extends Wind {
 
     public double mass; //kg
@@ -24,6 +26,7 @@ public class SpaceShip extends Wind {
     private double accByWind;
     private double relativeWindSpeed;
     public double force;
+    public static double TIME_SLICE= 0.1;
     //TODO add ytolerance
 
 

@@ -4,7 +4,7 @@ public class Wind {
     private double wind; //km/s
     public final double airDensity = 1.23995; //kg/m3
     public final double area = 17*4.5;
-    public static double TIME_SLICE=200; //in seconds
+
 
     public Wind(){
 
