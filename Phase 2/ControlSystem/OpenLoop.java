@@ -9,6 +9,7 @@ public class OpenLoop {
         Vector2D thruster = new Vector2D(); //(u(t), v(t)
 
 
+
 //        double trotate = timeForHalfRotation(36,1.2);
         double u = mainThruster(2.4E-15);
         double mu = mainThrusterForce(1.25E-15,100, 2.4E-15);
