@@ -31,6 +31,7 @@ public double update(double timeSlice) {
     this.addAccelerationByForce(wind); 
     this.addAccelerationByForce(friction);
     this.addAirResistance();
+    //this.checkAcceleration();
     
     // update velocity and location for each body
     this.updateVelocityAndLocation(timeSlice);
