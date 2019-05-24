@@ -131,6 +131,12 @@ public class SpaceShip2 {
     public void resetAcceleration() {
         acceleration = new Vector2D();
     }
+    
+    public void checkAcceleration() {
+    	if (acceleration.y > maxAcc) {
+        	acceleration.y = maxAcc;
+        }
+    }
 
     //calculates new velocity and update new location
     public void updateVelocityAndLocation(double timeSlice) {
@@ -144,7 +150,7 @@ public class SpaceShip2 {
         updateLocation(timeSlice, averageVelocity);
     }
 
-    //calculates the last of the accumilated velocity.
+    //calculates the last of the accumulated velocity.
     protected void updateVelocity(double timeSlice) {
         Vector2D velocityByAcc = new Vector2D(acceleration).mul(timeSlice);
         if (velocity.y > maxAcc) {
