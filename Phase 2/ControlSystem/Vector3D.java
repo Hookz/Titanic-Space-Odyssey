@@ -72,6 +72,10 @@ public class Vector3D {
         return this;
     }
 
+    public double norm() {
+        return Math.sqrt(x*x + y*y + z*z);
+    }
+
     public Vector3D normalize() {
         return mul(1.0/length());
     }
@@ -106,14 +110,24 @@ public class Vector3D {
         return Math.sqrt(distanceSquared(other));
     }
 
-    public Vector3D setElements(double x,double y,double z){
+    public Vector3D setElements(double x, double y, double z){
         return new Vector3D(x,y,z);
     }
 
+    public void setX(double x){
+        this.x = x;
+    }
 
+    public void setY(double y){
+        this.y = y;
+    }
+    public void setZ(double z){
+        this.z = z;
+    }
     @Override
     public String toString() {
-        return String.format("xAxis = %f, yAxis = %f, z = %f", x, y, z);
+
+        return String.format("xAxis = %f, yAxis = %f, theta = %f", x, y, z);
     }
 
 
