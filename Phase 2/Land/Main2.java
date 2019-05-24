@@ -89,7 +89,7 @@ public class Main2 extends Application {
         gc.fillOval(locLanding.x / REAL_SCALE + TRANSLATE_COOR, locLanding.y, 20, 5);
         gc.fillText("Landing location", locLanding.x / REAL_SCALE - 40 + TRANSLATE_COOR, locLanding.y + 30);
         
-        if ((spaceShip.getLocation().y / REAL_SCALE) > 550 - spaceShip.getLength()) {
+        if ((spaceShip.getLocation().y / REAL_SCALE) > 550 - spaceShip.getHeight()) {
         	paused = true;
         	landingLabel.setText("Landed!");
         	pauseButton.setText("Play");
@@ -106,7 +106,7 @@ public class Main2 extends Application {
         if (change) {//to rewind - using the rewind buttons
         	if (currentSpaceShip>0) {	
         		spaceShip = oldSpaceShips.get(oldSpaceShips.size()-1).copyMSS();
-        		gc.fillRect(spaceShip.getLocation().x / REAL_SCALE + TRANSLATE_COOR, spaceShip.getLocation().y / REAL_SCALE , spaceShip.getWidth(), spaceShip.getLength()); //width and height are not scaled
+        		gc.fillRect(spaceShip.getLocation().x / REAL_SCALE + TRANSLATE_COOR, spaceShip.getLocation().y / REAL_SCALE , spaceShip.getWidth(), spaceShip.getHeight()); //width and height are not scaled
         		oldSpaceShips.remove(oldSpaceShips.size()-1);
         		spaceShip.setSeconds(oldSpaceShips.get(oldSpaceShips.size()-1).getSeconds());
         		timeLabel.setText(spaceShip.getElapsedTimeAsString());
@@ -117,10 +117,10 @@ public class Main2 extends Application {
         }
         
         for (MovingSpaceShip spaces : oldSpaceShips) {
-        gc.fillOval(spaces.getLocation().x / REAL_SCALE + TRANSLATE_COOR, spaces.getLocation().y / REAL_SCALE + 0.5 * spaceShip.getLength(), 5, 5 );
+        gc.fillOval(spaces.getLocation().x / REAL_SCALE + TRANSLATE_COOR, spaces.getLocation().y / REAL_SCALE + 0.5 * spaceShip.getHeight(), 5, 5 );
         }
         
-        gc.fillRect(spaceShip.getLocation().x / REAL_SCALE + TRANSLATE_COOR, spaceShip.getLocation().y / REAL_SCALE , spaceShip.getWidth(), spaceShip.getLength());
+        gc.fillRect(spaceShip.getLocation().x / REAL_SCALE + TRANSLATE_COOR, spaceShip.getLocation().y / REAL_SCALE , spaceShip.getWidth(), spaceShip.getHeight());
         
         if (!paused) {//the normal updates
         	spaceShip.update(TIME_SLICE);
@@ -263,7 +263,7 @@ public class Main2 extends Application {
             public void handle(ActionEvent e) {
             	for (int i = 0; i <(60*5)/TIME_SLICE ; i++) {
             		spaceShip.update(TIME_SLICE);
-            		if (spaceShip.getLocation().y / REAL_SCALE > 550 - spaceShip.getLength()) {
+            		if (spaceShip.getLocation().y / REAL_SCALE > 550 - spaceShip.getHeight()) {
                     	paused = true;
                     	landingLabel.setText("Landed!");
                     	pauseButton.setText("Play");
@@ -293,7 +293,7 @@ public class Main2 extends Application {
     		public void handle(ActionEvent e) {
     			for (int i = 0; i <(60*20)/TIME_SLICE; i++) {
     				spaceShip.update(TIME_SLICE);
-    				if (spaceShip.getLocation().y / REAL_SCALE > 550 - spaceShip.getLength()) {
+    				if (spaceShip.getLocation().y / REAL_SCALE > 550 - spaceShip.getHeight()) {
     		        	paused = true;
     		        	landingLabel.setText("Landed!");
     		        	pauseButton.setText("Play");
