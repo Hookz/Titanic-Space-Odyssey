@@ -30,6 +30,7 @@ public class Main2 extends Application {
     public static final double REAL_SCALE = 750; //if we have 400 for the y-axis, which symbolises 300 km, every amount of meters should be divided by this, to get the number of steps for the coordinate
 
     public static final double TRANSLATE_COOR = 700;
+    public static final double TRANSLATE_COOR_TWO = 550;
     
     private FPSCounter fps = new FPSCounter();
 
@@ -88,7 +89,7 @@ public class Main2 extends Application {
         //mark the location where you want the spaceship to land
         gc.fillOval(locLanding.x / REAL_SCALE + TRANSLATE_COOR, locLanding.y, 20, 5);
         gc.fillText("Landing location", locLanding.x / REAL_SCALE - 40 + TRANSLATE_COOR, locLanding.y + 30);
-        
+         
         if ((spaceShip.getLocation().y / REAL_SCALE) > 550 - spaceShip.getHeight()) {
         	paused = true;
         	landingLabel.setText("Landed!");
@@ -106,7 +107,7 @@ public class Main2 extends Application {
         if (change) {//to rewind - using the rewind buttons
         	if (currentSpaceShip>0) {	
         		spaceShip = oldSpaceShips.get(oldSpaceShips.size()-1).copyMSS();
-        		gc.fillRect(spaceShip.getLocation().x / REAL_SCALE + TRANSLATE_COOR, spaceShip.getLocation().y / REAL_SCALE , spaceShip.getWidth(), spaceShip.getHeight()); //width and height are not scaled
+        		gc.fillRect(spaceShip.getLocation().x / REAL_SCALE + TRANSLATE_COOR,spaceShip.getLocation().y / REAL_SCALE , spaceShip.getWidth(), spaceShip.getHeight()); //width and height are not scaled
         		oldSpaceShips.remove(oldSpaceShips.size()-1);
         		spaceShip.setSeconds(oldSpaceShips.get(oldSpaceShips.size()-1).getSeconds());
         		timeLabel.setText(spaceShip.getElapsedTimeAsString());
@@ -189,7 +190,7 @@ public class Main2 extends Application {
         buttons.setStyle("-fx-background-color: #FFF44F;");
         buttons.setFillHeight(true);
         
-        buttons.getChildren().add(playBackButton);
+        //buttons.getChildren().add(playBackButton);
         buttons.getChildren().add(pauseButton);
         buttons.getChildren().add(fastForwardFiveMinButton);
         buttons.getChildren().add(fastForwardTwentyMinButton);

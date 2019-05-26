@@ -20,18 +20,22 @@ public MovingSpaceShip(double mass, Vector2D location, Vector2D velocity, double
 }
 
 public double update(double timeSlice) {
-     elapsedSeconds = (long) (elapsedSeconds + timeSlice);
+	elapsedSeconds = (long) (elapsedSeconds + timeSlice);
 	// reset acceleration, as it has to be calculated again
+	wind.calcDisplacement(this, this.getLocation().y);
+	this.getVelocity().x = this.getVelocity().x + wind.getWind()/1000;
     this.resetAcceleration();
-
+   
     //use the gravitational force, the wind and the tilt to calculate the acceleration for this spaceship
     this.addAccelerationByGravityForce(); //for now it's only the gravitational force - add wind and tilt when those classes are done
-    
-    //hardcoded for now
-    Vector2D windVector = new Vector2D(0,0);
-    this.addAccelerationByForce(windVector); 
     this.addAirResistance();
-    //this.checkAcceleration();
+    
+    //add the open loop system here - OpenLoop version 3
+    //BUT the coordinates for this and the OpenLoop are a bit different
+    //for this one, the lower you get, the bigger the y value gets, for the other one the smaller the y value gets!!!!
+    //so fix this issue!!
+    
+    
     
     // update velocity and location for each body
     this.updateVelocityAndLocation(timeSlice);

@@ -5,26 +5,21 @@ public class SpaceShip extends Wind {
     private Vector2D location; //in metres, at a certain point above titan. the zero point is where the rocket starts
     private Vector2D velocity; //m/s
     private Vector2D acceleration;// m/s^2
-    
-    private double gravity;//acceleration of gravity
-    private static final double massTitan = 1.3452E+23; //kg
-    public static final double gravTitan = 1.352; //acceleration due to gravity on titan, in ms^2
-    private static final double G = 6.67E-11;
-    private double tilt = 0; //radians
-    private double angularVelocity; // rad/s
-    public static final double spinTolerance = 0.02; //radians/s
-    public static final double tiltTolerance = 0.01; //rad
-    public static final double landingXTolerance = 0.01; //m/s
-    private double torque; //provided by the side thrusters
-    public double rotationAcceleration;
-    private boolean landed = false;
     private double height; //m
     private double width; //m
+    
+    private double tilt = 0; //radians
+    private double angularVelocity; // rad/s
+    private double torque; //provided by the side thrusters
+    public double rotationAcceleration;
+    
     private static final double maxAcc = 9.6; // m / s^2 ??? or m/s???
     private static final double dragCo = 0.10; //assuming it's streamlined, it's an estimate
     private static final double density = 1.23995416; //density of Titan's atmosphere, kg / m^3
-    
-    
+    public static final double spinTolerance = 0.02; //radians/s
+    public static final double tiltTolerance = 0.01; //rad
+    public static final double landingXTolerance = 0.01; //m/s
+    public static final double gravTitan = 1.352; //acceleration due to gravity on titan, in ms^2
 
     //TODO add ytolerance
 
@@ -152,12 +147,6 @@ public class SpaceShip extends Wind {
     //reset accelation after time period to recalculate everything
     public void resetAcceleration() {
         acceleration = new Vector2D();
-    }
-    
-    public void checkAcceleration() {
-    	if (acceleration.y > maxAcc) {
-        	acceleration.y = maxAcc;
-        }
     }
 
     //calculates new velocity and update new location
