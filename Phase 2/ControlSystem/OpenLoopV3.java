@@ -13,7 +13,7 @@ public class OpenLoopV3 {
         //velocity dot
         Vector3D acceleration = new Vector3D();
 
-        double freeFall = timeOnFreeFall(velocity.y, spaceShip.getCoordinates().y);
+        double freeFall = timeOnFreeFall(velocity.getY(), spaceShip.getCoordinates().getY());
         System.out.println("time on free fall: " + freeFall);
 
         //temp for old velocity and location
@@ -23,13 +23,13 @@ public class OpenLoopV3 {
         //Main loop:
 
 
-        while(spaceShip.coordinates.y > 0.0) {
-            tempLocation = spaceShip.coordinates;
+        while(spaceShip.getCoordinates().getY() > 0.0) {
+            tempLocation = spaceShip.getCoordinates();
             tempVelocity = velocity;
 
-            double newVX = (spaceShip.coordinates.x + spaceShip.calcDisplacement(200))/ freeFall;
-            double newVY = (spaceShip.coordinates.y + yDisplacement(spaceShip.coordinates.y)) / freeFall;
-            double newVZ = (spaceShip.coordinates.z + spaceShip.calcTilt(200)) /freeFall;
+            double newVX = (spaceShip.getCoordinates().getX() + spaceShip.calcDisplacement(200))/ freeFall;
+            double newVY = (spaceShip.getCoordinates().getY() + yDisplacement(spaceShip.getCoordinates().getY())) / freeFall;
+            double newVZ = (spaceShip.getCoordinates().getZ() + spaceShip.calcTilt(200)) /freeFall;
 
             //change velocity
             velocity.setX(newVX); //change time-step for dynamic solver :)
@@ -41,47 +41,47 @@ public class OpenLoopV3 {
             double vDot = velocity.norm();
 
             //change coordinates
-            spaceShip.coordinates.x = spaceShip.calcDisplacement(spaceShip.coordinates.y);
-            spaceShip.coordinates.z = spaceShip.calcTilt(spaceShip.coordinates.y);
-            spaceShip.coordinates.y = yDisplacement(spaceShip.coordinates.y);
+            spaceShip.getCoordinates().setX(spaceShip.calcDisplacement(spaceShip.getCoordinates().getY()));
+            spaceShip.getCoordinates().setZ(spaceShip.calcTilt(spaceShip.getCoordinates().getY()));
+            spaceShip.getCoordinates().setY(yDisplacement(spaceShip.getCoordinates().getY()));
 
-            System.out.println("x: " + spaceShip.coordinates.x);
-            System.out.println("y: " + spaceShip.coordinates.y);
-            System.out.println("theta: " + spaceShip.coordinates.z);
+            System.out.println("x: " + spaceShip.getCoordinates().getX());
+            System.out.println("y: " + spaceShip.getCoordinates().getY());
+            System.out.println("theta: " + spaceShip.getCoordinates().getZ());
 
             //x correct
-            thruster.x = mainThrusterForce(velocity.x, spaceShip.coordinates.x, velocity.z);
+            thruster.setX(mainThrusterForce(velocity.getX(), spaceShip.getCoordinates().getX(), velocity.getZ()));
             //update x
-            double rungeForXCorrection = rungeKutta4rth(velocity.z, spaceShip.coordinates.x, 0, spaceShip.TIME_SLICE);
+            double rungeForXCorrection = rungeKutta4rth(velocity.getZ(), spaceShip.getCoordinates().getX(), 0, spaceShip.TIME_SLICE);
             System.out.println("X correction " + + rungeForXCorrection);
-            spaceShip.coordinates.x = thruster.x * Math.sin(spaceShip.coordinates.z); //theta(z) correct
-            double timeForXToCorrect = timeForXCorrection(spaceShip.coordinates.x, velocity.x);
+            spaceShip.getCoordinates().setX(thruster.getX() * Math.sin(spaceShip.getCoordinates().getZ())); //theta(z) correct
+            double timeForXToCorrect = timeForXCorrection(spaceShip.getCoordinates().getX(), velocity.getX());
             System.out.println("time for x correct: " + timeForXToCorrect);
-            System.out.println("Thruster force: " + thruster.x);
+            System.out.println("Thruster force: " + thruster.getX());
 
 
             //rotate back theta(t) = 0. use code: thruster.y
             double timeForHalfRotationCorrection = timeForHalfRotation(freeFall + timeForXToCorrect, vDot); //fr
-            double findRotationDegree = findRotation(timeForHalfRotationCorrection, vDot, spaceShip.coordinates.z, velocity.z);
+            double findRotationDegree = findRotation(timeForHalfRotationCorrection, vDot, spaceShip.getCoordinates().getZ(), velocity.getZ());
             //check if rotation is 0.
             System.out.println("Time of half rotation correction: " + timeForHalfRotationCorrection);
             System.out.println("Current rotation: " + findRotationDegree);
             //y correct after x correct
-            double finalAcceleration = finalAcceleration(velocity.y, spaceShip.coordinates.y);
-            double timeForVerticalLand = appropriateTvalue(velocity.y, finalAcceleration);
-            double verticalLandingThruster = verticalLanding(velocity.y, spaceShip.coordinates.y);
-            spaceShip.coordinates.y = verticalLandingThruster*Math.cos(spaceShip.coordinates.z)  - g; //coordinate or velocity?
+            double finalAcceleration = finalAcceleration(velocity.getY(), spaceShip.getCoordinates().getY());
+            double timeForVerticalLand = appropriateTvalue(velocity.getY(), finalAcceleration);
+            double verticalLandingThruster = verticalLanding(velocity.getY(), spaceShip.getCoordinates().getY());
+            spaceShip.getCoordinates().setY(verticalLandingThruster*Math.cos(spaceShip.getCoordinates().getZ())  - g); //coordinate or velocity?
             //update velocity of y.
-            spaceShip.coordinates.y = 0;
+            spaceShip.getCoordinates().setY(0);
 
 
-            spaceShip.coordinates.toString();
+            spaceShip.getCoordinates().toString();
             System.out.println("Final accelartion: " + finalAcceleration);
             System.out.println("time on vertical landing: " + timeForVerticalLand);
             System.out.println("vertical landing thrust: " + verticalLandingThruster);
 
-            System.out.println("coordinates x: " + spaceShip.coordinates.x);
-            System.out.println("coordinates y: " + spaceShip.coordinates.y);
+            System.out.println("coordinates x: " + spaceShip.getCoordinates().getX());
+            System.out.println("coordinates y: " + spaceShip.getCoordinates().getY());
 
 
 //            //update
@@ -89,8 +89,8 @@ public class OpenLoopV3 {
 
         }
 
-        euler(tempVelocity.z, spaceShip.coordinates.z, 0.1, 0);
-        double rVersion = rungeKutta4rth(velocity.y, velocity.z, spaceShip.coordinates.y, 0.1);
+        euler(tempVelocity.getZ(), spaceShip.getCoordinates().getZ(), 0.1, 0);
+        double rVersion = rungeKutta4rth(velocity.getY(), velocity.getZ(), spaceShip.getCoordinates().getY(), 0.1);
         System.out.println("solution: " + rVersion);
 
 
@@ -211,7 +211,7 @@ public class OpenLoopV3 {
      * @return
      */
     public static boolean landSuccessfully(Vector3D finalCoordinates, Vector3D finalVelocity){
-        if(finalCoordinates.x <= spaceShip.getLandingXTolerance()) {
+        if(finalCoordinates.getX() <= spaceShip.getLandingXTolerance()) {
             return true;
             //&& finalVelocity.x <= spaceShip.getFinalXVelocity() &&
             //                finalVelocity.z <= spaceShip.getFinalAngularVelocity() && finalCoordinates.z <= spaceShip.getTiltTolerance()
@@ -322,7 +322,7 @@ public class OpenLoopV3 {
 
     //velocity dot for half rotation.
     public static double vDot(double y,double t){
-        return ((y-velocity.z)/t);
+        return ((y-velocity.getZ())/t);
     }
 
 

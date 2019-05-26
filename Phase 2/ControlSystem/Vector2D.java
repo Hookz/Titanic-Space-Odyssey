@@ -1,7 +1,7 @@
 package ControlSystem;
 
 public class Vector2D {
-    public double x,y;
+    private double x,y;
 
     public Vector2D() { }
 
@@ -29,6 +29,14 @@ public class Vector2D {
 
     public double getX() {
         return x;
+    }
+
+    public void setX(double x){
+        this.x = x;
+    }
+
+    public void setY(double y){
+        this.y = y;
     }
 
     //TODO: make arraylist getter for storing distance traveled
@@ -104,6 +112,7 @@ public class Vector2D {
         double dy = this.y - other.y;
         return dx*dx+dy*dy;
     }
+
     public double distance(Vector2D other) {
         return Math.sqrt(distanceSquared(other));
     }

@@ -14,7 +14,7 @@ public class OpenLoop {
         double u = mainThruster(2.4E-15);
         double mu = mainThrusterForce(1.25E-15,100, 2.4E-15);
         double a = accelarationForXCorrection(1.25E-15, 100);
-        double rotate = findRotation(31.6, a, initialVelocity.y, 0.5);
+        double rotate = findRotation(31.6, a, initialVelocity.getY(), 0.5);
         double trotate = timeForHalfRotation(36,a);
         double rotateX = rotateSpaceCraftForX(31.6, 30, 0, 100);
 //        double tvy = thrustAgainstVy(0,)

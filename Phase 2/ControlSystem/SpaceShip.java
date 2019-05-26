@@ -7,7 +7,7 @@ public class SpaceShip extends Wind {
     public double mass; //kg
     private double xVelocity;//
     private double yVelocity;//
-    public Vector3D coordinates;
+    private Vector3D coordinates;
     private double gravity;//acceleration of gravity
     public static final double MASS_TITAN = 1.3452E+23; //kg
     public static final double GRAV_TITAN = 1.352; //acceleration due to gravity on titan, in ms^2
@@ -45,27 +45,25 @@ public class SpaceShip extends Wind {
     }
 
     public void setXLocation(double x) {
-        setCoordinates(x,getCoordinates().y,getCoordinates().z);
+        setCoordinates(x,getCoordinates().getY(),getCoordinates().getZ());
     }
 
-    public double getXLocation() {
-        return getCoordinates().x;
-    }
+    public double getXLocation() { return getCoordinates().getX(); }
 
     public void setZLocation(double z) {
-        setCoordinates(getCoordinates().x,getCoordinates().y,z);
+        setCoordinates(getCoordinates().getX(),getCoordinates().getY(),z);
     }
 
     public double getZLocation() {
-        return getCoordinates().z;
+        return getCoordinates().getZ();
     }
 
     public void setYLocation(double y) {
-        setCoordinates(getCoordinates().x,y,getCoordinates().z);
+        setCoordinates(getCoordinates().getX(),y,getCoordinates().getZ());
     }
 
     public double getYLocation() {
-        return getCoordinates().y;
+        return getCoordinates().getY();
     }
 
     public void setCoordinates(double x, double y, double z){
@@ -201,7 +199,7 @@ public class SpaceShip extends Wind {
 
     public String toString() {
 
-        return String.format("xAxis = %f, yAxis = %f, theta = %f", coordinates.x, coordinates.y, coordinates.z);
+        return String.format("xAxis = %f, yAxis = %f, theta = %f", coordinates.getX(), coordinates.getY(), coordinates.getZ());
     }
 }
 
