@@ -52,13 +52,13 @@ public class OpenLoopV3 {
             //x correct
             thruster.x = mainThrusterForce(velocity.x, spaceShip.coordinates.x, velocity.z);
             //update x
+            double rungeForXCorrection = rungeKutta4rth(velocity.z, spaceShip.coordinates.x, 0, spaceShip.TIME_SLICE);
+            System.out.println("X correction " + + rungeForXCorrection);
             spaceShip.coordinates.x = thruster.x * Math.sin(spaceShip.coordinates.z); //theta(z) correct
             double timeForXToCorrect = timeForXCorrection(spaceShip.coordinates.x, velocity.x);
             System.out.println("time for x correct: " + timeForXToCorrect);
             System.out.println("Thruster force: " + thruster.x);
 
-
-            //System.out.println("ad: " + (velocity.z));
 
             //rotate back theta(t) = 0. use code: thruster.y
             double timeForHalfRotationCorrection = timeForHalfRotation(freeFall + timeForXToCorrect, vDot); //fr
@@ -80,6 +80,7 @@ public class OpenLoopV3 {
             System.out.println("time on vertical landing: " + timeForVerticalLand);
             System.out.println("vertical landing thrust: " + verticalLandingThruster);
 
+            System.out.println("coordinates x: " + spaceShip.coordinates.x);
             System.out.println("coordinates y: " + spaceShip.coordinates.y);
 
 
