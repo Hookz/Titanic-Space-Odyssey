@@ -1,5 +1,5 @@
 package Land;
-
+import ControlSystem.Vector2D;
 public class MovingSpaceShip extends SpaceShip{
 //to calculate how much time has passed
 private static final int SEC_IN_MINUTE = 60;
@@ -22,8 +22,8 @@ public MovingSpaceShip(double mass, Vector2D location, Vector2D velocity, double
 public double update(double timeSlice) {
 	elapsedSeconds = (long) (elapsedSeconds + timeSlice);
 	// reset acceleration, as it has to be calculated again
-	wind.calcDisplacement(this, this.getLocation().y);
-	this.getVelocity().x = this.getVelocity().x + wind.getWind()/1000;
+	wind.calcDisplacement(this, this.getLocation().getY());
+	this.getVelocity().setX(this.getVelocity().getX() + wind.getWind()/1000);
     this.resetAcceleration();
    
     //use the gravitational force, the wind and the tilt to calculate the acceleration for this spaceship

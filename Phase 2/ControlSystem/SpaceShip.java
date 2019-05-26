@@ -5,21 +5,22 @@ import java.sql.Time;
 public class SpaceShip extends Wind {
 
     public double mass; //kg
-    private double xVelocity;//
-    private double yVelocity;//
+    private Vector2D velocity;
+    private Vector2D acceleration;
     private Vector3D coordinates;
     private double gravity;//acceleration of gravity
     public static final double MASS_TITAN = 1.3452E+23; //kg
     public static final double GRAV_TITAN = 1.352; //acceleration due to gravity on titan, in ms^2
     public static final double G = 6.67E-11;
+    private static final double DENSITY = 1.23995416; // density of Titan's atmosphere, kg/m^3
+    private static final double MAX_ACCELERATION = 9.6; // m/s^2
     private double tilt = 0; //radians
     private double angularVelocity; // rad/s
     public static final double FINAL_ANGULAR_VELOCITY = 0.02; //radians/s //-0.02 //
     public static final double TILT_TOLERANCE = 0.01; //rad
     public static final double LANDING_X_TOLERANCE = 0.01; //m/s
     public static final double FINAL_X_VELOCITY = 0.1;
-    private double xAcceleration;
-    private double yAcceleration;
+    private static final double DRAG_CO = 0.10; //assuming it's streamlined, it's an estimate
     private double torque; //provided by the side thrusters
     private double rotationAcceleration;
     private boolean landed = false;
@@ -27,13 +28,34 @@ public class SpaceShip extends Wind {
     private double relativeWindSpeed;
     public double force;
     public static double TIME_SLICE= 0.1;
+    private double height; //m
+    private double width; //m
     //TODO add ytolerance
 
 
-    public SpaceShip(double mass, double xLocation, double yLocation, double zLocation) {
+    public SpaceShip(){
+        this.mass = 0;
+        this.coordinates = new Vector3D(0,0,0);
+        if (acceleration == null) {
+            acceleration = new Vector2D();
+        }
+        if (velocity == null) {
+            velocity = new Vector2D();
+        }
+        if (coordinates == null) {
+            coordinates = new Vector3D();
+        }
+        this.height = 0;
+        this.width = 0;
+    }
+    public SpaceShip(double mass, double xLocation, double yLocation, double zLocation, double height, double width) {
         super();
         this.mass = mass;
         this.coordinates = new Vector3D(xLocation,yLocation,zLocation);
+        this.height = height;
+        this.width = width;
+        this.acceleration = new Vector2D();
+        this.velocity = new Vector2D();
     }
 
     public void setMass(double mass) {
@@ -42,6 +64,22 @@ public class SpaceShip extends Wind {
 
     public double getMass() {
         return mass;
+    }
+
+    public void setAcceleration(Vector2D acceleration) {
+        this.acceleration = acceleration;
+    }
+
+    public Vector2D getAcceleration() {
+        return acceleration;
+    }
+
+    public void  setVelocity(Vector2D vel) {
+        velocity = vel;
+    }
+
+    public Vector2D getVelocity() {
+        return velocity;
     }
 
     public void setXLocation(double x) {
@@ -74,28 +112,61 @@ public class SpaceShip extends Wind {
         return coordinates;
     }
 
-    public void setXVelocity(double xVelocity){
-        this.xVelocity = xVelocity;
+    public Vector2D getLocation() {
+        return new Vector2D(coordinates.getX(),coordinates.getY());
     }
 
-    public double getXVelocity(){
-        return xVelocity;
+    public void setLocation(Vector2D loc) {
+        setCoordinates(loc.getX(),loc.getY(),coordinates.getZ());
     }
+
+    public void setXVelocity(double xVelocity){ this.velocity.setX(xVelocity); }
+
+    public double getXVelocity(){ return this.velocity.getX(); }
 
     public void setYVelocity(double yVelocity){
-        this.yVelocity = yVelocity;
+        this.velocity.setY(yVelocity);
     }
 
     public double getYVelocity(){
-        return yVelocity;
+        return this.velocity.getY();
     }
 
     public void addTilt(double tilt) {
         this.tilt = this.tilt + tilt;
     }
 
+    public void setTilt(double tilt) {
+        this.tilt = tilt;
+    }
+
     public double getTilt() {
         return tilt;
+    }
+
+    public void setHeight(double length) {
+        this.height = length;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public void setWidth(double width) {
+        this.width = width;
+    }
+
+    public double getRotationAcceleration(){
+        return rotationAcceleration;
+    }
+    public void setRotationAcceleration(double rA){
+        this.rotationAcceleration = rA;
+    }
+    public double getTorque(){
+        return torque;
+    }
+    public double getWidth() {
+        return width;
     }
 
     public double getGravity() {
@@ -106,19 +177,21 @@ public class SpaceShip extends Wind {
 
     //These are formulae for the acceleration
     public double calculateXAcceleration(double rotationInRads, double accelerationThruster){
-        this.xAcceleration = accelerationThruster*Math.sin(rotationInRads);
-        return xAcceleration;
+        this.acceleration.setX(accelerationThruster*Math.sin(rotationInRads));
+        return this.acceleration.getX();
     }
 
     public double calculateYAcceleration(double rotationInRads, double accelerationThruster){
-        this.yAcceleration = accelerationThruster*Math.cos(rotationInRads)- GRAV_TITAN;
-        return yAcceleration;
+        this.acceleration.setY(accelerationThruster*Math.cos(rotationInRads)- GRAV_TITAN);
+        return this.acceleration.getY();
     }
 
     public double calculateRotationAcceleration(){
         this.rotationAcceleration = torque;
         return rotationAcceleration;
     }
+
+
     //By choosing realistic values for the power of the thrusters we can now calculate the acceleration
 
     public double accByWind(double kmtosurface){
@@ -127,6 +200,30 @@ public class SpaceShip extends Wind {
         accByWind = this.force/this.getMass();
         System.out.println(this.getAccByWind());
         return accByWind;
+    }
+
+
+    //use the mass and distance to titan to calculate the acceleration
+    public void addAccelerationByGravityForce() {
+        //Vector2D grav = new Vector2D(0, this.getGravity());
+        Vector2D grav = new Vector2D(0, GRAV_TITAN * mass); //the force
+        addAccelerationByForce(grav);
+    }
+
+    public void addAirResistance() {
+        //without using tilt or anything
+        double resisX = 0.5 * DRAG_CO * DENSITY * (this.height * this.width) * this.velocity.getX();
+        double resisY = 0.5 * DRAG_CO * DENSITY * (this.width * this.width) * this.velocity.getY();
+        Vector2D resistance = new Vector2D(-resisX, -resisY);
+        addAccelerationByForce(resistance);
+
+    }
+
+    //add a force vector on a body
+    public void addAccelerationByForce(Vector2D force) {
+        Vector2D accByForce = new Vector2D(force);
+        accByForce.div(mass);
+        acceleration.add(accByForce);
     }
 
     public void calculateForce(){
@@ -196,6 +293,7 @@ public class SpaceShip extends Wind {
     public double getForce() {
         return force;
     }
+
 
     public String toString() {
 

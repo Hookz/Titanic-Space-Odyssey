@@ -103,7 +103,7 @@ public class ClosedLoop {
 
     public static final double g = 1.352;
 
-    public static SpaceShip spaceShip = new SpaceShip(5000,500,500,0);
+    public static SpaceShip spaceShip = new SpaceShip(5000,500,500,0,17,4.5);
 
     /**
      *

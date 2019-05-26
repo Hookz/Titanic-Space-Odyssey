@@ -107,7 +107,7 @@ public class OpenLoopV2 {
 
     public static final double g = 1.352;
 
-    public static SpaceShip spaceShip = new SpaceShip(5000,600,600,0);
+    public static SpaceShip spaceShip = new SpaceShip(5000,600,600,0,17,4.5);
 
     /**
      *

@@ -18,9 +18,18 @@ public class Vector2D {
             this.y = vec2D[1];
         }
     }
-    public Vector2D(Vector2D vec2D) {
-        this.x = vec2D.getX();
-        this.y = vec2D.getY();
+
+    public Vector2D(Vector2D other) {
+        this.x = other.x;
+        this.y = other.y;
+    }
+
+    public Vector2D add(Vector2D other) {
+        if (other != null) {
+            x += other.x;
+            y += other.y;
+        }
+        return this;
     }
 
     public double getY() {
@@ -122,4 +131,8 @@ public class Vector2D {
         return String.format("xAxis = %f, yAxis = %f", x, y);
     }
 
+    public Vector2D copy() {
+        Vector2D copy = new Vector2D(this.x, this.y);
+        return copy;
+    }
 }

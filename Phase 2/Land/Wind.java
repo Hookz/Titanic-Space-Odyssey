@@ -2,14 +2,15 @@ package Land;
 public class Wind {
 
     private double wind; //km/s
-    private final double airDensity = 1.23995; //kg/m3
-    private final double area = 17*4.5;
+    public final double airDensity = 1.23995; //kg/m3
+    public final double area = 17*4.5;
     private double relativeWindSpeed;
     public double force;
     private double accByWind;
     private static double TIME_SLICE=1; //in seconds
 
     public Wind(){
+        wind = 0;
     }
 
     public void calcWindSpeed(double kmFromSurface) {
@@ -73,12 +74,12 @@ public class Wind {
     }
 
     public void calculateRelativeWindSpeed(SpaceShip s){
-        relativeWindSpeed = s.getWind()-s.getVelocity().x;
+        relativeWindSpeed = s.getWind()-s.getVelocity().getX();
     }
 
     //Call this method for the x displacement in METERS
     public double calcDisplacement(SpaceShip s, double kmtosurface){
-        double displacement = s.getVelocity().y*TIME_SLICE + 0.5*(accByWind(s, kmtosurface)) * TIME_SLICE*TIME_SLICE;
+        double displacement = s.getVelocity().getY()*TIME_SLICE + 0.5*(accByWind(s, kmtosurface)) * TIME_SLICE*TIME_SLICE;
         return displacement;
     }
 
@@ -130,12 +131,4 @@ public class Wind {
 
         return tiltInRadians;
     }
-
-    /*
-    public static void main (String [] args){
-        SpaceShip s = new SpaceShip(5000,0,0);
-        System.out.println(s.calcDisplacement(s, 400));
-        System.out.print(s.getWind());
-    }
-    */
 }

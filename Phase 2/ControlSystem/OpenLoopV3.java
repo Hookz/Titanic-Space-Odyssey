@@ -20,10 +20,7 @@ public class OpenLoopV3 {
         Vector3D tempLocation = new Vector3D();
         Vector3D tempVelocity = new Vector3D();
 
-        //Main loop:
 
-
-        while(spaceShip.getCoordinates().getY() > 0.0) {
             tempLocation = spaceShip.getCoordinates();
             tempVelocity = velocity;
 
@@ -85,9 +82,8 @@ public class OpenLoopV3 {
 
 
 //            //update
-            timePassed += spaceShip.TIME_SLICE;
+//            timePassed += spaceShip.TIME_SLICE;
 
-        }
 
         euler(tempVelocity.getZ(), spaceShip.getCoordinates().getZ(), 0.1, 0);
         double rVersion = rungeKutta4rth(velocity.getY(), velocity.getZ(), spaceShip.getCoordinates().getY(), 0.1);
@@ -100,7 +96,7 @@ public class OpenLoopV3 {
 
     public static final double g = 1.352;
 
-    public static SpaceShip spaceShip = new SpaceShip(5000,600,600,0);
+    public static SpaceShip spaceShip = new SpaceShip(5000,600,600,0,17,4.5);
 
     /**
      *
