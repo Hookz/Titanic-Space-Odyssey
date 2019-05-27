@@ -41,7 +41,7 @@ public class Main2 extends Application {
     private Label landingLabel;
     private Label velocityLabelX;
     private Label velocityLabelY;
-    private Label goalLabel;
+    //private Label goalLabel;
     private Button pauseButton;
     private Button fastForwardTwentyMinButton;
     private Button fastForwardFiveMinButton;
@@ -50,7 +50,7 @@ public class Main2 extends Application {
     private boolean change = false;
     private double spaceshipMass = 5000; // kg
     public MovingSpaceShip spaceShip;
-    private Vector2D locLanding;
+    //private Vector2D locLanding;
     
     private int currentSpaceShip = 0;
     private ArrayList<MovingSpaceShip> oldSpaceShips = new ArrayList<>();
@@ -87,19 +87,19 @@ public class Main2 extends Application {
         gc.strokeLine(TRANSLATE_COOR, 0, TRANSLATE_COOR, 550);
         
         //mark the location where you want the spaceship to land
-        gc.fillOval(locLanding.getX() / REAL_SCALE + TRANSLATE_COOR, locLanding.getY(), 20, 5);
-        gc.fillText("Landing location", locLanding.getX() / REAL_SCALE - 40 + TRANSLATE_COOR, locLanding.getY() + 30);
+        //gc.fillOval(locLanding.getX() / REAL_SCALE + TRANSLATE_COOR, locLanding.getY(), 20, 5);
+        //gc.fillText("Landing location", locLanding.getX() / REAL_SCALE - 40 + TRANSLATE_COOR, locLanding.getY() + 30);
          
         if ((spaceShip.getLocation().getY() / REAL_SCALE) > 550 - spaceShip.getHeight()) {
         	paused = true;
         	landingLabel.setText("Landed!");
         	pauseButton.setText("Play");
-        	if (spaceShip.getLocation().getX() < locLanding.getX() + 10&& spaceShip.getLocation().getX() > locLanding.getX() - 10 && spaceShip.landingSucceeded()) {
+        	/*if (spaceShip.getLocation().getX() < locLanding.getX() + 10&& spaceShip.getLocation().getX() > locLanding.getX() - 10 && spaceShip.landingSucceeded()) {
         		goalLabel.setText("Landing succeeded");
         	}
         	else {
         		goalLabel.setText("Landing failed");
-        	}
+        	}*/
         }
         
         // when y < 0, then stop -> it has hit titan
@@ -145,7 +145,7 @@ public class Main2 extends Application {
     	
     	spaceShip = new MovingSpaceShip(spaceshipMass, spaceshipLoc, spaceshipVeloc, length, width);
     	
-    	locLanding = new Vector2D(100 * REAL_SCALE, 550); //marks the desired landing site - y should always be 550, as that is the ground of titan
+    	//locLanding = new Vector2D(100 * REAL_SCALE, 550); //marks the desired landing site - y should always be 550, as that is the ground of titan
     	
     }
 
@@ -156,7 +156,7 @@ public class Main2 extends Application {
         createFPSLabel();
         createLandingLabel();
         createVelocityLabels();
-        createGoalLabel();
+        //createGoalLabel();
         
         HBox hbox = createHBox();
         border.setBottom(hbox);
@@ -205,7 +205,7 @@ public class Main2 extends Application {
         
         VBox moreLabels = new VBox();
         moreLabels.getChildren().add(timeLabel);
-        moreLabels.getChildren().add(goalLabel);
+        //moreLabels.getChildren().add(goalLabel);
         moreLabels.setSpacing(10);   // Gap between nodes
         moreLabels.setStyle("-fx-background-color: #FFF44F;");
         moreLabels.setFillWidth(true);
@@ -268,12 +268,12 @@ public class Main2 extends Application {
                     	paused = true;
                     	landingLabel.setText("Landed!");
                     	pauseButton.setText("Play");
-                    	if (spaceShip.getLocation().getX() < locLanding.getX() + 10*REAL_SCALE && spaceShip.getLocation().getX() > locLanding.getX() - 10*REAL_SCALE && spaceShip.landingSucceeded()) {
+                    	/*if (spaceShip.getLocation().getX() < locLanding.getX() + 10*REAL_SCALE && spaceShip.getLocation().getX() > locLanding.getX() - 10*REAL_SCALE && spaceShip.landingSucceeded()) {
                     		goalLabel.setText("Landing succeeded");
                     	}
                     	else {
                     		goalLabel.setText("Landing failed");
-                    	}
+                    	}*/
                     	break;
                     }
     				timeLabel.setText(spaceShip.getElapsedTimeAsString());
@@ -298,12 +298,12 @@ public class Main2 extends Application {
     		        	paused = true;
     		        	landingLabel.setText("Landed!");
     		        	pauseButton.setText("Play");
-    		        	if (spaceShip.getLocation().getX() < locLanding.getX() + 10*REAL_SCALE && spaceShip.getLocation().getX() > locLanding.getX() - 10*REAL_SCALE && spaceShip.landingSucceeded()) {
+    		        	/*if (spaceShip.getLocation().getX() < locLanding.getX() + 10*REAL_SCALE && spaceShip.getLocation().getX() > locLanding.getX() - 10*REAL_SCALE && spaceShip.landingSucceeded()) {
     		        		goalLabel.setText("Landing succeeded");
     		        	}
     		        	else {
     		        		goalLabel.setText("Landing failed");
-    		        	}
+    		        	}*/
     		        	break;
     		        }
     				timeLabel.setText(spaceShip.getElapsedTimeAsString());
@@ -364,13 +364,13 @@ public class Main2 extends Application {
     	
     }
     
-    private void createGoalLabel() {
+    /*private void createGoalLabel() {
     	goalLabel = new Label();
         goalLabel.setPrefSize(300, 20);
         goalLabel.setFont(new Font("Serif", 16));
         goalLabel.setTextFill(Color.BLACK);
         goalLabel.setText("Pending...");
-    }
+    }*/
 
     public static void main(String[] args) {
         launch(args);
