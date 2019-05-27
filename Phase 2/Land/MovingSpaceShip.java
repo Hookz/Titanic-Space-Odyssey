@@ -51,16 +51,6 @@ public String getElapsedTimeAsString() {
     return String.format("Years:%08d, Days:%03d, Hours:%02d, Minutes:%02d, Seconds:%02d", years, days, hours, minutes, seconds);
 }
 
-//to determine whether it was a successful landing
-public boolean landingSucceeded() {
-	if (this.getTilt() < this.tiltTolerance) {
-		return true;
-	}
-	else {
-		return false;
-	}
-}
-
 public long getSeconds() {
 	return elapsedSeconds;
 }
