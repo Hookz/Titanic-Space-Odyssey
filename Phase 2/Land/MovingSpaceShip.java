@@ -26,7 +26,7 @@ public double update(double timeSlice) {
 	this.getVelocity().setX(this.getVelocity().getX() + wind.getWind()/1000);
     this.resetAcceleration();
    
-    //use the gravitational force, the wind and the tilt to calculate the acceleration for this spaceship
+    //use the gravitational force, the wind and the tilt to calculat e the acceleration for this spaceship
     this.addAccelerationByGravityForce(); //for now it's only the gravitational force - add wind and tilt when those classes are done
     this.addAirResistance();
     
