@@ -5,9 +5,9 @@ import java.sql.Time;
 public class SpaceShip extends Wind {
 
     public double mass; //kg
-    private Vector2D velocity;
-    private Vector2D acceleration;
-    private Vector3D coordinates;
+    protected Vector2D velocity;
+    protected Vector2D acceleration;
+    protected Vector3D coordinates;
     private double gravity;//acceleration of gravity
     public static final double MASS_TITAN = 1.3452E+23; //kg
     public static final double GRAV_TITAN = 1.352; //acceleration due to gravity on titan, in ms^2

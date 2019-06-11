@@ -1,9 +1,9 @@
 package ControlSystem;
 
 public class Vector3D {
-    private double x;
-    private double y;
-    private double z;
+    protected double x;
+    protected double y;
+    protected double z;
 
     public Vector3D() {
     }
