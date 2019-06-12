@@ -79,3 +79,11 @@ fabric.properties
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+# Ignore Eclipse files #
+.classpath
+.project
+bin/sample/sample.fxml
+
+# I think some Mac stuff #
+.DS_Store
