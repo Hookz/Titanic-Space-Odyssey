@@ -5,6 +5,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -51,12 +52,41 @@ public class Main2 extends Application {
     private double spaceshipMass = 5000; // kg
     public MovingSpaceShip spaceShip;
     //private Vector2D locLanding;
-    
+    private Button restartApplication;
     private int currentSpaceShip = 0;
     private ArrayList<MovingSpaceShip> oldSpaceShips = new ArrayList<>();
-    
-    @Override
-    public void start(Stage stage) {
+    private HBox buttons;
+
+    void cleanup() {
+        fps = new FPSCounter();
+        canvasWidth = 0;
+        canvasHeight = 0;
+        timeLabel = null;
+        fpsLabel = null;
+        landingLabel = null;
+        velocityLabelX = null;
+        velocityLabelY = null;
+        //private Label goalLabel;
+        pauseButton = null;
+        fastForwardTwentyMinButton = null;
+        fastForwardFiveMinButton = null;
+        paused = true;
+        playBackButton = null;
+        change = false;
+        spaceshipMass = 5000; // kg
+        spaceShip = null;
+        //private Vector2D locLanding;
+        restartApplication = null;
+        currentSpaceShip = 0;
+        oldSpaceShips = new ArrayList<>();
+    }
+
+    void startProcedure(Stage stage) {
+        restartApplication = new Button("Restart");
+        restartApplication.setFont(new Font("Comic Sans MS", 16));
+        restartApplication.setOnAction(e -> {
+            restart(stage);
+        });
         createSpaceship();
         GraphicsContext gc = createGui(stage);
         Timeline timeline = new Timeline();
@@ -71,6 +101,16 @@ public class Main2 extends Application {
         timeline.getKeyFrames().add(kf);
         timeline.play();
         stage.show();
+    }
+
+    void restart(Stage stage) {
+        cleanup();
+        startProcedure(stage);
+    }
+
+    @Override
+    public void start(Stage stage) {
+        startProcedure(stage);
     }
 
     protected void updateFrame(GraphicsContext gc) {
@@ -93,7 +133,10 @@ public class Main2 extends Application {
         if ((spaceShip.getLocation().getY() / REAL_SCALE) > 550 - spaceShip.getHeight()) {
         	paused = true;
         	landingLabel.setText("Landed!");
-        	pauseButton.setText("Play");
+            buttons.getChildren().remove(0);
+            buttons.getChildren().add(0,restartApplication);
+            fastForwardFiveMinButton.setDisable(true);
+            fastForwardTwentyMinButton.setDisable(true);
         	/*if (spaceShip.getLocation().getX() < locLanding.getX() + 10&& spaceShip.getLocation().getX() > locLanding.getX() - 10 && spaceShip.landingSucceeded()) {
         		goalLabel.setText("Landing succeeded");
         	}
@@ -178,7 +221,7 @@ public class Main2 extends Application {
     
     private HBox createHBox() {
         HBox hbox = new HBox();
-        HBox buttons = new HBox();
+        buttons = new HBox();
         
         createPauseButton();
         createFastForwardFiveMinButton();
@@ -243,77 +286,60 @@ public class Main2 extends Application {
     	pauseButton.setFont(new Font("Serif", 16));
     	pauseButton.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
-                if (paused) {
-                	paused = false;
-                	pauseButton.setText("Pause");
-                }
-                else {
-                	paused = true;
-                	pauseButton.setText("Play");
-                }
+                    if (paused) {
+                        paused = false;
+                        pauseButton.setText("Pause");
+                    } else {
+                        paused = true;
+                        pauseButton.setText("Play");
+                    }
             }
         });
     	
     }
-    
-    private void createFastForwardFiveMinButton() {
-    	fastForwardFiveMinButton = new Button();
-    	fastForwardFiveMinButton.setText("Skip five min");
-    	fastForwardFiveMinButton.setFont(new Font("Serif", 16));
-    	fastForwardFiveMinButton.setOnAction(new EventHandler<ActionEvent>() {
+    private EventHandler<ActionEvent> forwardButtons(){
+        EventHandler eh = new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
-            	for (int i = 0; i <(60*5)/TIME_SLICE ; i++) {
-            		spaceShip.update(TIME_SLICE);
-            		if (spaceShip.getLocation().getY() / REAL_SCALE > 550 - spaceShip.getHeight()) {
-                    	paused = true;
-                    	landingLabel.setText("Landed!");
-                    	pauseButton.setText("Play");
-                    	/*if (spaceShip.getLocation().getX() < locLanding.getX() + 10*REAL_SCALE && spaceShip.getLocation().getX() > locLanding.getX() - 10*REAL_SCALE && spaceShip.landingSucceeded()) {
-                    		goalLabel.setText("Landing succeeded");
-                    	}
-                    	else {
-                    		goalLabel.setText("Landing failed");
-                    	}*/
-                    	break;
-                    }
-    				timeLabel.setText(spaceShip.getElapsedTimeAsString());
-                    if (spaceShip.getSeconds() % (60*20) == 0) {
-    	            	oldSpaceShips.add(spaceShip.copyMSS());
-    	            	currentSpaceShip++;
-    	            }
-    			}
-            }
-        });
-    }
-    
-    private void createFastForwardTwentyMinButton() {
-    	fastForwardTwentyMinButton = new Button();
-    	fastForwardTwentyMinButton.setText("Skip twenty min");
-    	fastForwardTwentyMinButton.setFont(new Font("Serif", 16));
-    	fastForwardTwentyMinButton.setOnAction(new EventHandler<ActionEvent>() {
-    		public void handle(ActionEvent e) {
-    			for (int i = 0; i <(60*20)/TIME_SLICE; i++) {
-    				spaceShip.update(TIME_SLICE);
-    				if (spaceShip.getLocation().getY() / REAL_SCALE > 550 - spaceShip.getHeight()) {
-    		        	paused = true;
-    		        	landingLabel.setText("Landed!");
-    		        	pauseButton.setText("Play");
+                for (int i = 0; i <(60*20)/TIME_SLICE; i++) {
+                    spaceShip.update(TIME_SLICE);
+                    if (spaceShip.getLocation().getY() / REAL_SCALE > 550 - spaceShip.getHeight()) {
+                        paused = true;
+                        fastForwardFiveMinButton.setDisable(true);
+                        fastForwardTwentyMinButton.setDisable(true);
+                        landingLabel.setText("Landed!");
+                        buttons.getChildren().remove(0);
+                        buttons.getChildren().add(0,restartApplication);
     		        	/*if (spaceShip.getLocation().getX() < locLanding.getX() + 10*REAL_SCALE && spaceShip.getLocation().getX() > locLanding.getX() - 10*REAL_SCALE && spaceShip.landingSucceeded()) {
     		        		goalLabel.setText("Landing succeeded");
     		        	}
     		        	else {
     		        		goalLabel.setText("Landing failed");
     		        	}*/
-    		        	break;
-    		        }
-    				timeLabel.setText(spaceShip.getElapsedTimeAsString());
+                        break;
+                    }
+                    timeLabel.setText(spaceShip.getElapsedTimeAsString());
                     if (spaceShip.getSeconds() % (60*20) == 0) {
-    	            	oldSpaceShips.add(spaceShip.copyMSS());
-    	            	currentSpaceShip++;
-    	            }
-    			}
-    		}
-    	});
+                        oldSpaceShips.add(spaceShip.copyMSS());
+                        currentSpaceShip++;
+                    }
+                }
+            }
+        };
+        return eh;
+    }
+
+    private void createFastForwardFiveMinButton() {
+    	fastForwardFiveMinButton = new Button();
+    	fastForwardFiveMinButton.setText("Skip five min");
+    	fastForwardFiveMinButton.setFont(new Font("Serif", 16));
+    	fastForwardFiveMinButton.setOnAction(forwardButtons());
+    }
+    
+    private void createFastForwardTwentyMinButton() {
+    	fastForwardTwentyMinButton = new Button();
+    	fastForwardTwentyMinButton.setText("Skip twenty min");
+    	fastForwardTwentyMinButton.setFont(new Font("Serif", 16));
+    	fastForwardTwentyMinButton.setOnAction(forwardButtons());
     }
     
     private void createPlayBackButton() {
