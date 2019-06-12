@@ -142,5 +142,9 @@ public class Vector3D {
         return String.format("xAxis = %f, yAxis = %f, theta = %f", x, y, z);
     }
 
+	public Vector3D copy() {
+		return new Vector3D(this.x, this.y, this.z);
+	}
+
 
 }
