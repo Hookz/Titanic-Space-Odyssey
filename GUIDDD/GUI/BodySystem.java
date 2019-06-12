@@ -29,7 +29,7 @@ public class BodySystem {
         bodies.add(body);
     }
 
-    public double update(double timeSlice) {
+    public double update(final double timeSlice) {
         // reset acceleration so we can accumulate acceleration due to gravitation from all bodies
         bodies.stream().forEach(i -> i.resetAcceleration()) ;
 
