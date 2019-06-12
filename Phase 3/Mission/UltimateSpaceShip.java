@@ -9,29 +9,31 @@ public class UltimateSpaceShip {
 	private boolean goingToEarth = false;
 	private boolean landingOnEarth = false;
 	
+	private boolean tries = true; //an arbitrary boolean for now
+	
 	public void update(int timeSlice) {
 		if(goingToTitan) {
 			
-			if() {
+			if(tries) {
 				goingToTitan = false;
 				landingOnTitan = true;
 			}
 		}
 		else if(landingOnTitan) {
-			if() {
+			if(tries) {
 				landingOnTitan = false;
 				goingToEarth = true;
 			}
 		}
 		else if(goingToEarth) {
-			if() {
+			if(tries) {
 				goingToEarth = false;
 				landingOnEarth = true;
 			}
 			
 		}
 		else if(landingOnEarth) {
-			if(){
+			if(tries){
 				landingOnEarth = false;
 			}
 		}
