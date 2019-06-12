@@ -266,7 +266,6 @@ public class SpaceShip extends Wind {
         return tiltInRadians;
     }
 
-
     public double getAccByWind() {
         return this.accByWind;
     }

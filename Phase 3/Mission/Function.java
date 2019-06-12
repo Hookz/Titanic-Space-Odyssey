@@ -1,4 +1,4 @@
-package ControlSystem;
+package Mission;
 
 public interface Function {
     public double f(double x);

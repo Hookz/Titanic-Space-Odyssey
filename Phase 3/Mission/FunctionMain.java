@@ -1,4 +1,4 @@
-package ControlSystem;
+package Mission;
 
 public class FunctionMain {
     private static final double STEPSIZE = 0.000001;

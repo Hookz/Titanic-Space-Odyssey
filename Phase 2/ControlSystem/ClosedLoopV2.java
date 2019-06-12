@@ -15,8 +15,8 @@ public class ClosedLoopV2 {
             Vector3D tempLocation = spaceShip.coordinates;
             Vector3D tempVelocity = velocity;
 
-            tempLocation = spaceShip.coordinates;
-            tempVelocity = velocity;
+            //tempLocation = spaceShip.coordinates;
+            //tempVelocity = velocity;
 
             spaceShip.coordinates.setY(spaceShip.coordinates.getY() - spaceShip.coordinates.getY() * timePassed);
             spaceShip.coordinates.setZ(spaceShip.calcTilt(spaceShip.coordinates.getY()));
@@ -72,7 +72,7 @@ public class ClosedLoopV2 {
             timePassed += spaceShip.TIME_SLICE;
         }
 
-        System.out.println("Total time: " + t);
+        System.out.println("Total time: " + timePassed);
 
     }
 

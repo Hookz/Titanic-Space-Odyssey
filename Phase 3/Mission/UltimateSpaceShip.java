@@ -1,28 +1,25 @@
 package Mission;
 
-import ControlSystem.Vector2D;
-import Land.Wind;
-
 //the only spaceship class we'll need
 
 public class UltimateSpaceShip extends Wind{
+	//for the time:
 	private static final int SEC_IN_MINUTE = 60;
 	private static final int SEC_IN_HOUR = SEC_IN_MINUTE * 60;
 	private static final int SEC_IN_DAY = SEC_IN_HOUR * 24;
 	private static final int SEC_IN_YEAR = 31556926;
 	private long elapsedSeconds = 0;
+	private double timeSlice;
 	
+	//about the spaceship itself
 	public double mass; //kg
+	private double height; //m
+    private double width; //m
+    
     protected Vector3D velocity;
     protected Vector3D acceleration;
     protected Vector3D coordinates;
-    
-    private double gravity;//acceleration of gravity
-    public static final double MASS_TITAN = 1.3452E+23; //kg
-    public static final double GRAV_TITAN = 1.352; //acceleration due to gravity on titan, in ms^2
-    public static final double G = 6.67E-11;
-    
-    private static final double DENSITY = 1.23995416; // density of Titan's atmosphere, kg/m^3    
+     private Vector2D location; //in metres, at a certain point above titan. the zero point is where the rocket starts
     private double tilt = 0; //radians
     
     public static final double FINAL_ANGULAR_VELOCITY = 0.02; //radians/s //-0.02 //
@@ -32,23 +29,24 @@ public class UltimateSpaceShip extends Wind{
     
     private static final double DRAG_CO = 0.10; //assuming it's streamlined, it's an estimate
     private double torque; //provided by the side thrusters
+    public static final double spinTolerance = 0.02; //radians/s
+    public static final double tiltTolerance = 0.01; //rad
+    
+    //about titan or space:
+    private double gravity;//acceleration of gravity
+    public static final double MASS_TITAN = 1.3452E+23; //kg
+    public static final double GRAV_TITAN = 1.352; //acceleration due to gravity on titan, in ms^2
+    public static final double G = 6.67E-11;
+    private static final double DENSITY = 1.23995416; // density of Titan's atmosphere, kg/m^3    
+    public static final double gravTitan = 1.352; //acceleration due to gravity on titan, in ms^2
+    private static final double maxAcc = 9.6; // m / s^2 ??? or m/s???
+    
     private double rotationAcceleration;
     private double accByWind;
     private double relativeWindSpeed;
-    
     public double force;
-    public static double TIME_SLICE= 0.1;
-    private double height; //m
-    private double width; //m
     
-    private Vector2D location; //in metres, at a certain point above titan. the zero point is where the rocket starts
-    
-    private static final double maxAcc = 9.6; // m / s^2 ??? or m/s???
-    public static final double spinTolerance = 0.02; //radians/s
-    public static final double tiltTolerance = 0.01; //rad
-    public static final double landingXTolerance = 0.01; //m/s
-    public static final double gravTitan = 1.352; //acceleration due to gravity on titan, in ms^2
-	
+    //to control which update is used
 	private boolean goingToTitan = true;
 	private boolean landingOnTitan = false;
 	private boolean goingToEarth = false;
@@ -57,10 +55,24 @@ public class UltimateSpaceShip extends Wind{
 	private boolean tries = true; //an arbitrary boolean for now
 	
 	public UltimateSpaceShip() {
+		if (this.coordinates == null) {
+			this.coordinates = new Vector3D();
+		}
+		if (this.velocity == null) {
+			this.velocity = new Vector3D();
+		}
+		if (this.acceleration == null) {
+			this.acceleration = new Vector3D();
+		}
 	}
 
-	public UltimateSpaceShip(double mass, Vector3D location, Vector3D velocity, double height, double width) {
-		
+	public UltimateSpaceShip(double mass, Vector3D coordinates, Vector3D velocity, double height, double width, double timeSlice) {
+		this.mass = mass;
+		this.coordinates = coordinates;
+		this.velocity = velocity;
+		this.height = height;
+		this.width = width;
+		this.timeSlice = timeSlice;
 		
 	}
 	
@@ -147,6 +159,7 @@ public class UltimateSpaceShip extends Wind{
         return velocity;
     }
 
+    //change the coordinates at only one point
     public void setXLocation(double x) {
         setCoordinates(x,getCoordinates().getY(),getCoordinates().getZ());
     }
@@ -169,6 +182,7 @@ public class UltimateSpaceShip extends Wind{
         return getCoordinates().getY();
     }
 
+    //setter and getter for coordinates
     public void setCoordinates(double x, double y, double z){
         this.coordinates = new Vector3D(x,y,z);
     }
@@ -177,6 +191,7 @@ public class UltimateSpaceShip extends Wind{
         return coordinates;
     }
 
+    //more setters and getters
     public void setXVelocity(double xVelocity){ this.velocity.setX(xVelocity); }
 
     public double getXVelocity(){ return this.velocity.getX(); }
@@ -225,7 +240,10 @@ public class UltimateSpaceShip extends Wind{
     public double getWidth() {
         return width;
     }
+    
+    
 
+    //calculate - to get the forces and accelerations - for the landing?
     public double getGravity() {
         double metersToSurface = getYLocation() * 1000;
         gravity = (getMass()* MASS_TITAN *G)/(metersToSurface*metersToSurface);
@@ -297,7 +315,7 @@ public class UltimateSpaceShip extends Wind{
 
     public double calcDisplacement(double kmtosurface){
         //System.out.println(accByWind(s, ));
-        double displacement = this.getXVelocity()*TIME_SLICE + 0.5*(accByWind(kmtosurface)) * TIME_SLICE*TIME_SLICE;
+        double displacement = this.getXVelocity()*timeSlice + 0.5*(accByWind(kmtosurface)) * timeSlice*timeSlice;
         return displacement;
     }
 
@@ -395,10 +413,10 @@ public class UltimateSpaceShip extends Wind{
     }
 
     public String toString() {
-
         return String.format("xAxis = %f, yAxis = %f, theta = %f", coordinates.getX(), coordinates.getY(), coordinates.getZ());
     }
 	
+    //needed to store multiple versions of the spaceship
 	public UltimateSpaceShip copyUSS() {
 		UltimateSpaceShip copy = new UltimateSpaceShip();
 		copy.setMass(mass);
@@ -412,6 +430,4 @@ public class UltimateSpaceShip extends Wind{
 		return copy;
 
 	}
-	
-
 }
