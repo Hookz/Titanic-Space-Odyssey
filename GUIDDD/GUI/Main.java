@@ -5,14 +5,20 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Orientation;
 import javafx.geometry.Point3D;
 import javafx.scene.Camera;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.PointLight;
 import javafx.scene.Scene;
+import javafx.scene.SceneAntialiasing;
+import javafx.scene.SubScene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ToolBar;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
@@ -25,9 +31,10 @@ public class Main extends Application {
 	private double locX;
 	private double locY;
 	private Camera camera;
-	private Group group;
+	//private Group group;
 	private SolarSystem solarS;
 	private Scene scene;
+	private SubScene subScene;
 	
 	
 	public void start(Stage primaryStage) throws Exception{
@@ -35,21 +42,36 @@ public class Main extends Application {
 		solarS = new SolarSystem();
 		createCamera();
 		createLight();
-		createGroup();
-		createScene();
-	
+		Group group = createGroup();
+		
+		
+		subScene = new SubScene(group, Scaling.WIDTH - 100, Scaling.HEIGHT, true, SceneAntialiasing.BALANCED);
+	    subScene.setCamera(camera);
+	    createSubScene();
+	    
+	    // 2D
+	    BorderPane pane = new BorderPane();
+	    Button button = new Button();
+	    ToolBar toolBar = new ToolBar(button);
+	    toolBar.setOrientation(Orientation.VERTICAL);
+	    pane.setCenter(subScene);
+	    pane.setPrefSize(300,300);
+	    pane.setRight(toolBar);
+	    
+	    scene = new Scene(pane, Scaling.WIDTH, Scaling.HEIGHT);
+	    
 		primaryStage.setTitle("Solarsystem in 3D");
 		primaryStage.setScene(scene);
 		
 		primaryStage.addEventHandler(ScrollEvent.SCROLL, event -> {
-			double diff = event.getDeltaY() * 25;
+			double diff = event.getDeltaY() * 50;
 			camera.translateZProperty().set(camera.getTranslateZ() + diff);
 	});
 		
 		primaryStage.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
 			   switch (event.getCode()) {
 			   	case Y:
-				   camera.getTransforms().add(new Rotate(10, Rotate.Y_AXIS));
+			   		camera.getTransforms().add(new Rotate(10, Rotate.Y_AXIS));
 			   		break;
 			   
 			   	case H:
@@ -94,8 +116,8 @@ public class Main extends Application {
 	);*/
 	}
 	
-	public void createGroup() {
-		group = new Group();
+	public Group createGroup() {
+		Group group = new Group();
 		PointLight sun = createLight();
 		for (Sphere s: solarS.getSpheres()) {
 			group.getChildren().add(s);
@@ -107,6 +129,8 @@ public class Main extends Application {
 			
 		}
 		group.getChildren().add(sun);
+		group.getChildren().add(camera);
+		return group;
 	}
 	
 	public PointLight createLight() {
@@ -116,17 +140,15 @@ public class Main extends Application {
 		return sun;
 	}
 	
-	public void createScene() {
-		scene = new Scene(group, Scaling.WIDTH, Scaling.HEIGHT);
-		scene.setFill(new Color(0.0, 0.33, 0.66, 1));
-		scene.setCamera(camera);
+	public void createSubScene() {
+		subScene.setFill(new Color(0.0, 0.33, 0.66, 1));
 		
-		scene.setOnMousePressed(event -> {
+		subScene.setOnMousePressed(event -> {
 		     locX = event.getSceneX();
 		     locY = event.getSceneY();
 		   });
 		 
-		   scene.setOnMouseDragged(event -> {
+		   subScene.setOnMouseDragged(event -> {
 			 camera.translateXProperty().set(camera.getTranslateX() + (locX - event.getSceneX())/75);
 			 camera.translateYProperty().set(camera.getTranslateY() + (locY - event.getSceneY())/75);
 		   });
