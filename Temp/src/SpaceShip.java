@@ -13,7 +13,8 @@ public class SpaceShip {
      * @param directionVector vector of the direction in which thrust is to be applied
      * @param isUnitVector if it is not a unit vector, transform into unit vector
      * this method calculates the velocity by using the thrust for the implemented timestep
-     * by transforming the directional vector into a unit vector the undirectional magnitude of the thrust can be simply applied in the wanted direction
+     * by transforming the directional vector into a unit vector the undirectional magnitude of the thrust
+     * can be simply applied in the wanted direction
      *
      */
     public void calculateVelocity(final Vector3D directionVector, boolean isUnitVector){
