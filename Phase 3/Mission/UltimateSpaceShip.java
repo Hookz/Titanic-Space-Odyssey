@@ -9,7 +9,7 @@ public class UltimateSpaceShip extends Wind{
 	private static final int SEC_IN_DAY = SEC_IN_HOUR * 24;
 	private static final int SEC_IN_YEAR = 31556926;
 	private long elapsedSeconds = 0;
-	private double timeSlice;
+	public double timeSlice;
 	
 	//about the spaceship itself
 	public double mass; //kg
@@ -18,6 +18,11 @@ public class UltimateSpaceShip extends Wind{
     
     protected Vector3D velocity;
     protected Vector3D acceleration;
+    //need 2D vectors for this???
+    protected Vector2D velocityLanding; 
+    protected Vector2D accelerationLanding;
+    
+    //location is for landing, coordinates are for the trajectory -> as they both differ
     protected Vector3D coordinates;
      private Vector2D location; //in metres, at a certain point above titan. the zero point is where the rocket starts
     private double tilt = 0; //radians
@@ -39,14 +44,14 @@ public class UltimateSpaceShip extends Wind{
     public static final double G = 6.67E-11;
     private static final double DENSITY = 1.23995416; // density of Titan's atmosphere, kg/m^3    
     public static final double gravTitan = 1.352; //acceleration due to gravity on titan, in ms^2
-    private static final double maxAcc = 9.6; // m / s^2 ??? or m/s???
+    private static final double maxAcc = 9.6; // m / s^2 ??? or m/s??? find a reliable source
     
     private double rotationAcceleration;
     private double accByWind;
     private double relativeWindSpeed;
     public double force;
     
-    //to control which update is used
+    //to control which update is used - so what the spaceship is doing at the moment
 	private boolean goingToTitan = true;
 	private boolean landingOnTitan = false;
 	private boolean goingToEarth = false;
@@ -64,16 +69,19 @@ public class UltimateSpaceShip extends Wind{
 		if (this.acceleration == null) {
 			this.acceleration = new Vector3D();
 		}
+		if (this.location == null) {
+			this.location = new Vector2D();
+		}
 	}
 
-	public UltimateSpaceShip(double mass, Vector3D coordinates, Vector3D velocity, double height, double width, double timeSlice) {
+	public UltimateSpaceShip(double mass, Vector3D coor, Vector3D vel, double height, double width, double timeSlice) {
 		this.mass = mass;
-		this.coordinates = coordinates;
-		this.velocity = velocity;
+		this.coordinates = coor;
+		this.velocity = vel;
 		this.height = height;
 		this.width = width;
 		this.timeSlice = timeSlice;
-		
+		this.location = new Vector2D(); //can only be instantiated when the orbit of titan is reached - then we know a the location above titan
 	}
 	
 	public void update(int timeSlice) {
@@ -114,7 +122,7 @@ public class UltimateSpaceShip extends Wind{
 			}
 		}
 		else {
-			System.out.println("No more updates");
+			System.out.println("No more updates, travel to Titan is completed.");
 		}
 	}
 	
@@ -127,6 +135,7 @@ public class UltimateSpaceShip extends Wind{
 	    return String.format("Years:%08d, Days:%03d, Hours:%02d, Minutes:%02d, Seconds:%02d", years, days, hours, minutes, seconds);
 	}
 
+	//getters and setters
 	public long getSeconds() {
 		return elapsedSeconds;
 	}
@@ -243,7 +252,7 @@ public class UltimateSpaceShip extends Wind{
     
     
 
-    //calculate - to get the forces and accelerations - for the landing?
+    //calculate - to get the forces and accelerations - for the landing
     public double getGravity() {
         double metersToSurface = getYLocation() * 1000;
         gravity = (getMass()* MASS_TITAN *G)/(metersToSurface*metersToSurface);
