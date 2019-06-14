@@ -142,7 +142,23 @@ public class Vector3D {
         return String.format("xAxis = %f, yAxis = %f, theta = %f", x, y, z);
     }
 
-	public Vector3D copy() {
+    public Vector3D unitVector(){
+        double magnitude = Math.sqrt(lengthSquared());
+        double newX = this.x/magnitude;
+        double newY = this.y/magnitude;
+        double newZ = this.z/magnitude;
+        Vector3D unitVec = new Vector3D(newX, newY, newZ);
+        return unitVec;
+    }
+
+    public Vector3D multiplyDimencions(Vector3D other){
+        this.x *= other.x;
+        this.y *= other.y;
+        this.z *= other.z;
+        return this;
+    }
+
+    public Vector3D copy() {
 		return new Vector3D(this.x, this.y, this.z);
 	}
 

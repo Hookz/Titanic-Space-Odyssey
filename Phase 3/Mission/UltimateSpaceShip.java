@@ -10,50 +10,56 @@ public class UltimateSpaceShip extends Wind{
 	private static final int SEC_IN_YEAR = 31556926;
 	private long elapsedSeconds = 0;
 	private double timeSlice;
-	
+
 	//about the spaceship itself
-	public double mass; //kg
-	private double height; //m
+	  public double mass; //kg
+	  private double height; //m
     private double width; //m
-    
+    public final double MASS_EMPTY =130000; //mass w/out fuel kg
+    public double massOfFuel;
+    public boolean inSpace = true;
+    public boolean thrusting = false;
     protected Vector3D velocity;
     protected Vector3D acceleration;
     protected Vector3D coordinates;
-     private Vector2D location; //in metres, at a certain point above titan. the zero point is where the rocket starts
+    private Vector2D location; //in metres, at a certain point above titan. the zero point is where the rocket starts
     private double tilt = 0; //radians
-    
+
+    public static final double THRUST_AT_SL = 6770; //kN thrust at sea level(Rocketdyne f-1: Saturn V's rocket engine calculated with specific Impulse)
+    public static final double THRUST_AT_VACUUM = 7770; //kN thrust in a vacuum (Rocketdyne f-1: Saturn V's rocket engine calculated with specific Impulse)
+    public static final double FUEL_MASS_FLOW_RATE = 788; //kg/s fuel mass depletion at maximum thrust per second
     public static final double FINAL_ANGULAR_VELOCITY = 0.02; //radians/s //-0.02 //
     public static final double TILT_TOLERANCE = 0.01; //rad
     public static final double LANDING_X_TOLERANCE = 0.01; //m/s
     public static final double FINAL_X_VELOCITY = 0.1;
-    
+
     private static final double DRAG_CO = 0.10; //assuming it's streamlined, it's an estimate
     private double torque; //provided by the side thrusters
     public static final double spinTolerance = 0.02; //radians/s
     public static final double tiltTolerance = 0.01; //rad
-    
+
     //about titan or space:
     private double gravity;//acceleration of gravity
     public static final double MASS_TITAN = 1.3452E+23; //kg
     public static final double GRAV_TITAN = 1.352; //acceleration due to gravity on titan, in ms^2
     public static final double G = 6.67E-11;
-    private static final double DENSITY = 1.23995416; // density of Titan's atmosphere, kg/m^3    
+    private static final double DENSITY = 1.23995416; // density of Titan's atmosphere, kg/m^3
     public static final double gravTitan = 1.352; //acceleration due to gravity on titan, in ms^2
     private static final double maxAcc = 9.6; // m / s^2 ??? or m/s???
-    
+
     private double rotationAcceleration;
     private double accByWind;
     private double relativeWindSpeed;
     public double force;
-    
+
     //to control which update is used
 	private boolean goingToTitan = true;
 	private boolean landingOnTitan = false;
 	private boolean goingToEarth = false;
 	private boolean landingOnEarth = false;
-	
+
 	private boolean tries = true; //an arbitrary boolean for now
-	
+
 	public UltimateSpaceShip() {
 		if (this.coordinates == null) {
 			this.coordinates = new Vector3D();
@@ -73,14 +79,14 @@ public class UltimateSpaceShip extends Wind{
 		this.height = height;
 		this.width = width;
 		this.timeSlice = timeSlice;
-		
+
 	}
-	
+
 	public void update(int timeSlice) {
 		if(goingToTitan) {
 			//trajectory to titan
-			
-			
+
+
 			if(tries) {
 				goingToTitan = false;
 				landingOnTitan = true;
@@ -88,8 +94,8 @@ public class UltimateSpaceShip extends Wind{
 		}
 		else if(landingOnTitan) {
 			//add the phase 2 stuff here - so it updates every time slice
-			
-			
+
+
 			if(tries) {
 				landingOnTitan = false;
 				goingToEarth = true;
@@ -97,18 +103,18 @@ public class UltimateSpaceShip extends Wind{
 		}
 		else if(goingToEarth) {
 			//trajectory back to earth
-			
-			
+
+
 			if(tries) {
 				goingToEarth = false;
 				landingOnEarth = true;
 			}
-			
+
 		}
 		else if(landingOnEarth) {
 			//also phase 2, yet now it has to be changed for earth
-			
-			
+
+
 			if(tries){
 				landingOnEarth = false;
 			}
@@ -117,7 +123,7 @@ public class UltimateSpaceShip extends Wind{
 			System.out.println("No more updates");
 		}
 	}
-	
+
 	public String getElapsedTimeAsString() {
 	    long years = elapsedSeconds / SEC_IN_YEAR;
 	    long days = (elapsedSeconds % SEC_IN_YEAR) / SEC_IN_DAY;
@@ -134,7 +140,7 @@ public class UltimateSpaceShip extends Wind{
 	public void setSeconds(long seconds) {
 		this.elapsedSeconds = seconds;
 	}
-	
+
 	public void setMass(double mass) {
         this.mass = mass;
     }
@@ -240,8 +246,8 @@ public class UltimateSpaceShip extends Wind{
     public double getWidth() {
         return width;
     }
-    
-    
+
+
 
     //calculate - to get the forces and accelerations - for the landing?
     public double getGravity() {
@@ -384,18 +390,22 @@ public class UltimateSpaceShip extends Wind{
         // updateVelocityAndLocation location using average velocity
         Vector3D changedVelocityAverage = new Vector3D(this.getVelocity()).sub(oldVelocity).div(2.0);
         Vector3D averageVelocity = new Vector3D(oldVelocity).add(changedVelocityAverage);
-        
+
         Vector2D removeZ = new Vector2D(averageVelocity.getX(), averageVelocity.getY());
         updateLocation(timeSlice, removeZ);
     }
 
     //calculates the last of the accumulated velocity.
+    //TODO add directional vector towards titan so thrust in is the proper direction
     protected void updateVelocity(double timeSlice) {
         Vector3D velocityByAcc = new Vector3D(getAcceleration()).mul(timeSlice);
         if (getVelocity().getY() > maxAcc) {
         	getVelocity().setY(maxAcc);
         }
         setVelocity(getVelocity().add(velocityByAcc));
+//        if(thrusting){
+//            calculateVelocityFromThrust(direcitonVec, true/false);
+//        }
     }
 
     //updates location
@@ -415,7 +425,7 @@ public class UltimateSpaceShip extends Wind{
     public String toString() {
         return String.format("xAxis = %f, yAxis = %f, theta = %f", coordinates.getX(), coordinates.getY(), coordinates.getZ());
     }
-	
+
     //needed to store multiple versions of the spaceship
 	public UltimateSpaceShip copyUSS() {
 		UltimateSpaceShip copy = new UltimateSpaceShip();
@@ -430,4 +440,50 @@ public class UltimateSpaceShip extends Wind{
 		return copy;
 
 	}
+    /**
+     *
+     * @param directionVector vector of the direction in which thrust is to be applied
+     * @param isUnitVector if it is not a unit vector, transform into unit vector
+     * this method calculates the velocity by using the thrust for the implemented timestep
+     * by transforming the directional vector into a unit vector the undirectional magnitude of the thrust
+     * can be simply applied in the wanted direction
+     *
+     */
+    public void calculateVelocityFromThrust(final Vector3D directionVector, boolean isUnitVector) {
+        Vector3D directionUnitVector;
+        if (isUnitVector) {
+            directionUnitVector = directionVector;
+        } else {
+            directionUnitVector = directionVector.unitVector();
+        }
+        if (inSpace) {
+            velocity.add(directionUnitVector.mul(THRUST_AT_VACUUM * TIME_SLICE));
+            velocity.add(directionUnitVector.div(MASS_EMPTY + massOfFuel));
+            massOfFuel -= (FUEL_MASS_FLOW_RATE * TIME_SLICE);
+        } else {
+
+            velocity.add(directionUnitVector.mul(THRUST_AT_SL * TIME_SLICE));
+            velocity.add(directionUnitVector.div(MASS_EMPTY + massOfFuel));
+            massOfFuel -= (FUEL_MASS_FLOW_RATE * TIME_SLICE);
+        }
+    }
+    /**
+     *
+     * @param body the planet for which we will be in geostationary orbit. From this we will require mass and radius of the planet
+     * @param rotationalPeriod we want this to be the same as the body's rotation on its axis. This effectively removes relative movement  of our spaceShip to the surface of the body
+     * @return the height from the surface of the planet required for geostationary orbit
+     * this equation is derived from centripetal force acceleration: m1(v^2)/r and the gravitational force on a satellite: G*m1*m2/r^2
+     * this can be used to find the starting height for the lunar landing module.
+     */
+
+    //TODO import Body somehow as we need it for the trajectory to titan
+    /*
+    public double calcGeostationaryOrbitHeight(final Body body, final double rotationalPeriod){
+        double r;
+        double m2 = body.mass;
+        r = Math.cbrt((G*m2*rotationalPeriod*rotationalPeriod)/(4*Math.PI*Math.PI));
+        r -= body.radius; //we remove the radius of the body we are orbiting as the above equation gives us the distance from the centre of gravity
+        return r;
+    }
+    */
 }
