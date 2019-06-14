@@ -2,27 +2,33 @@ package ControlSystem;
 
 public class OpenLoopV3 {
     public static void main(String[] main) {
-        Vector2D thruster = new Vector2D(0,0); //x is u, y is v
-
+        //Vector2D thruster = new Vector2D(0,0); //x is u, y is v
+    	
+        System.out.println("initial x loc is " + spaceShip.getCoordinates().x);
+        System.out.println("initial y loc is " + spaceShip.getCoordinates().y);
 
         double freeFall = timeOnFreeFall(velocity.y, spaceShip.getCoordinates().y);
         System.out.println("time on free fall: " + freeFall);
-        double timePassed = 0;
+        //double timePassed = 0;
 
         //temp for old velocity and location
         Vector3D tempLocation = spaceShip.coordinates;
         Vector3D tempVelocity = velocity;
 
+        double newVX = (spaceShip.coordinates.x + spaceShip.calcDisplacement(spaceShip.coordinates.y*3/4))/ (freeFall/10);
+        double newVY = (spaceShip.coordinates.y + yDisplacement(spaceShip.coordinates.y)) / (freeFall/10);
+        double newVZ = (spaceShip.coordinates.z + spaceShip.calcTilt(125)) /(freeFall/10);
+        
+        newVY = freeFall * g;
 
-        double newVX = (spaceShip.coordinates.x + spaceShip.calcDisplacement(125))/ freeFall;
-        double newVY = (spaceShip.coordinates.y + yDisplacement(spaceShip.coordinates.y)) / freeFall;
-        double newVZ = (spaceShip.coordinates.z + spaceShip.calcTilt(125)) /freeFall;
-
+        System.out.println("VX " + newVX);
+        System.out.println("VY " + newVY);
+        System.out.println("VZ " + newVZ);
+        
         //change velocity
         velocity.setX(newVX); //change time-step for dynamic solver :)
         velocity.setY(newVY);
         velocity.setZ(newVZ);
-
 
         //double vDot = velocity.norm();
 
@@ -51,61 +57,20 @@ public class OpenLoopV3 {
         return y0/4;
     }
 
-
+    //which formula is this?????
     public static double timeOnFreeFall(double vy0, double y0) {
-        double t = (-vy0 + Math.sqrt(Math.abs(vy0*vy0 - 4*(g/2)* (1/4.0) * y0) ))/g;
+        //double t = (-vy0 + Math.sqrt(Math.abs(vy0*vy0 - 4*(g/2)* (1/4.0) * y0) ))/g;
+    	double t = Math.sqrt((y0 * 3/4 *1000)/ (0.5 * g));
         return t;
     }
 
-
-    //velocity dot for half rotation.
-    public static double vDot(double y,double t){
-        return ((y-velocity.z)/t); //t*t
-    }
-
-    //solvers
-    //https://www.geeksforgeeks.org/euler-method-solving-differential-equation/
-    public static void euler(double x0, double y, double h, double x) {
-        double temp = -0;
-
-        while(x0 < x) {
-            temp = y;
-            y = y + h * vDot(y,h); //add initial here
-            x0 = x0 + h;
-        }
-
-        System.out.println("Approximate solution at x = "
-                + x + " is " + y);
-    }
-
-    //https://www.geeksforgeeks.org/runge-kutta-4th-order-method-solve-differential-equation/
-    public static double rungeKutta4rth(double x0, double y0, double x, double h) {
-        //number of iterations:
-        int n = (int) ((x-x0)/h);
-
-        double k1, k2, k3, k4, k5;
-
-        //iterate
-
-        double y = y0;
-        for(int i = 1; i <= n; i++) {
-            k1 = h * vDot(x0, y);
-            k2 = h * vDot(x0 + 0.5*h, y + 0.5*k1);
-            k3 = h * vDot(x0 + 0.5*h, y + 0.5*k2);
-            k4 = h * vDot(x0 + h, y + k3);
-
-            //update y
-            y = y + (1/6.0) * (k1 + 2*k2 + 2*k3 + k4);
-            x0 += h;
-        }
-
-        return y;
-    }
-
     public static void ZControl(Vector3D tempCoordinate, Vector3D tempVelocity, double timeOnFreeFall) {
-        System.out.println("T velocity z: " + velocity.z);
+    	ODESolvers solver = new ODESolvers(spaceShip);
+    	
+    	System.out.println("T velocity z: " + velocity.z);
         System.out.println("T z: " + spaceShip.coordinates.z);
-        double vDot = rungeKutta4rth(timeOnFreeFall, velocity.z, 1, spaceShip.TIME_SLICE);
+        Vector3D velocCopy = new Vector3D(velocity.x, velocity.y, velocity.z);
+        double vDot = solver.rungaKutta4thOrder(timeOnFreeFall, 1, spaceShip.TIME_SLICE, velocCopy.z);
         System.out.println("vDot: " + vDot);
         double t = Math.sqrt((spaceShip.coordinates.z - tempCoordinate.z) / vDot);
         System.out.println("T t z: " + t);
