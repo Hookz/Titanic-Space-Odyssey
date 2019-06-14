@@ -8,7 +8,7 @@ public class Wind {
     private double relativeWindSpeed;
     public double force;
     private double accByWind;
-    private static double TIME_SLICE=1; //in seconds
+    public static double TIME_SLICE=1; //in seconds
 
     public Wind(){
         wind = 0;
