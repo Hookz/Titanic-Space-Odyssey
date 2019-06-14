@@ -39,6 +39,7 @@ public class SpaceShip {
     /**
      *
      * @param body the planet for which we will be in geostationary orbit. From this we will require mass and radius of the planet
+     * @param rotationalPeriod we want this to be the same as the body's rotation on its axis. This effectively removes relative movement  of our spaceShip to the surface of the body
      * @return the height from the surface of the planet required for geostationary orbit
      * this equation is derived from centripetal force acceleration: m1(v^2)/r and the gravitational force on a satellite: G*m1*m2/r^2
      * this can be used to find the starting height for the lunar landing module.
