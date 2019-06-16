@@ -1,5 +1,7 @@
 package OpenLoopAgain;
 
+import java.util.ArrayList;
+
 public class Wind {
 
     private double wind; //km/s
@@ -9,7 +11,7 @@ public class Wind {
     public double force;
     private double accByWind;
     private static double TIME_SLICE=1; //in seconds
-
+  
     public Wind(){
         wind = 0;
     }
@@ -42,11 +44,11 @@ public class Wind {
         }
 
         else if (wind < 0 && direction>=0.8) {
-            //switch of sign
             wind = randWindSpeed;
         }
         else if (wind < 0 && direction<0.8){
-            wind = -randWindSpeed;
+            //switch of sign
+        	wind = -randWindSpeed;
         }
 
         else if (wind > 0 && direction>=0.8) {
@@ -57,7 +59,6 @@ public class Wind {
             wind = randWindSpeed;
         }
         return wind;
-    //For now, we put a limit on the maximum wind speed, since
     }
 
     public double accByWind(SpaceShip s, double kmtosurface){
@@ -70,18 +71,35 @@ public class Wind {
     public void calculateForce(SpaceShip s){
         calculateRelativeWindSpeed(s);
         s.force = (area/2)*airDensity*(relativeWindSpeed*relativeWindSpeed);
-        if (s.getRelativeWindSpeed()<0)
+        
+        if (s.getRelativeWindSpeed()<0) {
             s.force = -s.force;
-
+        }
     }
-
+    
+    public ArrayList<Double> calculateForcesForWholeTraject(SpaceShip spaceship, double kilometresStart) {
+    	//an arraylist of the wind force every km
+    	ArrayList<Double> forces = new ArrayList(); 
+    	
+    	//loop through every kilometre
+    	while(kilometresStart> -1) { 
+    		calcWindSpeed(kilometresStart);
+    		calculateForce(spaceship);
+    		forces.add(this.getForce());
+    		kilometresStart = kilometresStart - 1;
+    	}
+    	
+    	return forces;
+    }
+    
+    
     public void calculateRelativeWindSpeed(SpaceShip s){
         relativeWindSpeed = s.getWind()-s.getVelocity().getX();
     }
 
     //Call this method for the x displacement in METERS
     public double calcDisplacement(SpaceShip s, double kmtosurface){
-        double displacement = s.getVelocity().getY()*TIME_SLICE + 0.5*(accByWind(s, kmtosurface)) * TIME_SLICE*TIME_SLICE;
+        double displacement = s.getVelocity().getX()*TIME_SLICE + 0.5*(accByWind(s, kmtosurface)) * TIME_SLICE*TIME_SLICE;
         return displacement;
     }
     
@@ -109,6 +127,7 @@ public class Wind {
     public double getForce() {
         return force;
     }
+    
 
     //Call this method to get the tilt in radians (positive wind is negative tilt)
     //this method adjusts tilt in SpaceShip class
