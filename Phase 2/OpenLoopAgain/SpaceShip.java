@@ -15,6 +15,7 @@ public class SpaceShip extends Wind {
 	private Vector2D location; //in  meters away from the goal
 	private double height; //m
 	private double width; //m
+	private boolean titan; //to determine whether it's landing on titan
 	
 	//all zero at the start
 	private double tilt = 0; //radians
@@ -24,9 +25,10 @@ public class SpaceShip extends Wind {
 	private double accelerationByMainThrusters = 0; //by the main - also known as u
 	
 	//constants
-	private static final double GRAV_TITAN = 1.352; //acceleration due to gravity on titan, in m/s^2
-	private static final double GRAV_EARTH = 9.81; //acceleration due to gravity on earth, in m/s^2
-	private static final double DENSITY = 1.23995416; // density of Titan's atmosphere, kg/m^3
+	protected static final double GRAV_TITAN = 1.352; //acceleration due to gravity on titan, in m/s^2
+	protected static final double GRAV_EARTH = 9.81; //acceleration due to gravity on earth, in m/s^2
+	private static final double DENSITY_TITAN = 1.23995416; // density of Titan's atmosphere, kg/m^3
+	private static final double DENSITY_EARTH = 1.2041; //densiy of Earth's atmosphere, kg/m^3
 	private static final double DRAG_CO = 0.10; //assuming it's streamlined, it's an estimate
 	
 	//tolerance values for the landing
@@ -37,7 +39,9 @@ public class SpaceShip extends Wind {
 	private static final double FINAL_Y_VELOCITY = 0.1; //m/s
 
 		//standard spaceship, for more advanced ones the set methods can be used
-		public SpaceShip(double mass, Vector2D velocity, Vector2D acceleration, Vector2D location, double height, double width) {
+		public SpaceShip(double mass, Vector2D velocity, Vector2D acceleration, Vector2D location, double height, double width, boolean titan) {
+			super(titan); //to determine whether this spaceship is landing on titan
+			this.titan = titan;
 			this.mass = mass;
 			this.velocity = velocity;
 			this.acceleration = acceleration;
@@ -194,7 +198,12 @@ public class SpaceShip extends Wind {
 
 	    public double calculateYAcceleration(/*double rotationInRads, double accelerationThruster*/){
 	        //this.acceleration.setY(accelerationThruster*Math.cos(rotationInRads)- GRAV_TITAN);
-	    	this.acceleration.setY(accelerationByMainThrusters*Math.cos(tilt) - GRAV_TITAN);
+	    	if(titan) {
+	    		this.acceleration.setY(accelerationByMainThrusters*Math.cos(tilt) - GRAV_TITAN);
+	    	}
+	    	else {
+	    		this.acceleration.setY(accelerationByMainThrusters*Math.cos(tilt) - GRAV_EARTH);
+	    	}
 	        return this.acceleration.getY();
 	    }
 
@@ -210,7 +219,7 @@ public class SpaceShip extends Wind {
 	    //use the mass and distance to titan to calculate the acceleration
 	    public void addAccelerationByGravityForceTitan() {
 	        //Vector2D grav = new Vector2D(0, this.getGravity());
-	        Vector2D grav = new Vector2D(0, GRAV_TITAN * mass); //the force
+	    	Vector2D grav = new Vector2D(0, GRAV_TITAN * mass); //the force
 	        addAccelerationByForce(grav);
 	    }
 	    
@@ -222,8 +231,15 @@ public class SpaceShip extends Wind {
 	    //add the air resistance to this spaceship
 	    public void addAirResistance() {
 	        //without using tilt or anything
-	        double resisX = 0.5 * DRAG_CO * DENSITY * (this.height * this.width) * this.velocity.getX();
-	        double resisY = 0.5 * DRAG_CO * DENSITY * (this.width * this.width) * this.velocity.getY();
+	    	double resisX, resisY;
+	    	if (titan) {
+	    		resisX = 0.5 * DRAG_CO * DENSITY_TITAN * (this.height * this.width) * this.velocity.getX();
+	    		resisY = 0.5 * DRAG_CO * DENSITY_TITAN * (this.width * this.width) * this.velocity.getY();
+	    	}
+	    	else {
+	    		resisX = 0.5 * DRAG_CO * DENSITY_EARTH * (this.height * this.width) * this.velocity.getX();
+	    		resisY = 0.5 * DRAG_CO * DENSITY_EARTH * (this.width * this.width) * this.velocity.getY();
+	    	}
 	        Vector2D resistance = new Vector2D(-resisX, -resisY);
 	        addAccelerationByForce(resistance);
 

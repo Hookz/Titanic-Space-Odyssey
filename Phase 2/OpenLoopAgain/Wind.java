@@ -5,15 +5,19 @@ import java.util.ArrayList;
 public class Wind {
 
     private double wind; //km/s
-    public final double airDensity = 1.23995; //kg/m3
+    public final double airDensityTitan = 1.23995; //kg/m3
+    public final double airDensityEarth = 1.2041; //kg/m3 (for 20 degrees celsius)
     public final double area = 17*4.5;
     private double relativeWindSpeed;
     public double force;
     private double accByWind;
     private static double TIME_SLICE=1; //in seconds
+    private boolean titan; //whether it's landing on earth or titan- true = titan
   
-    public Wind(){
+    public Wind(boolean titan){
         wind = 0;
+        this.titan = titan;
+        
     }
 
     public double calcWindSpeed(double kmFromSurface) {
@@ -70,7 +74,12 @@ public class Wind {
 
     public void calculateForce(SpaceShip s){
         calculateRelativeWindSpeed(s);
-        s.force = (area/2)*airDensity*(relativeWindSpeed*relativeWindSpeed);
+        if (titan) {
+        	s.force = (area/2)*airDensityTitan*(relativeWindSpeed*relativeWindSpeed);
+    	}
+        else {
+        	s.force = (area/2) * airDensityEarth*(relativeWindSpeed*relativeWindSpeed);
+        }
         
         if (s.getRelativeWindSpeed()<0) {
             s.force = -s.force;
@@ -112,8 +121,12 @@ public class Wind {
         return this.accByWind;
     }
 
-    public double getAirDensity() {
-        return airDensity;
+    public double getAirDensityTitan() {
+        return airDensityTitan;
+    }
+    
+    public double getAirDensityEarth() {
+    	return airDensityEarth;
     }
 
     public double getArea() {
