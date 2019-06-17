@@ -192,24 +192,33 @@ public class SpaceShip extends Wind {
 	    //These are formulae for the acceleration
 	    public double calculateXAcceleration(/*double rotationInRads, double accelerationThruster*/){
 	        //this.acceleration.setX(accelerationThruster*Math.sin(rotationInRads));
-	    	this.acceleration.setX(accelerationByMainThrusters * Math.sin(tilt));
-	        return this.acceleration.getX();
+	    	double accX = accelerationByMainThrusters * Math.sin(tilt);
+	    	System.out.println("newly calculated acc x is:" +  accX);
+	        return accX;
 	    }
 
 	    public double calculateYAcceleration(/*double rotationInRads, double accelerationThruster*/){
 	        //this.acceleration.setY(accelerationThruster*Math.cos(rotationInRads)- GRAV_TITAN);
+	    	double accY;
+	    	
 	    	if(titan) {
-	    		this.acceleration.setY(accelerationByMainThrusters*Math.cos(tilt) - GRAV_TITAN);
+	    		accY = accelerationByMainThrusters*Math.cos(tilt) - GRAV_TITAN;
 	    	}
 	    	else {
-	    		this.acceleration.setY(accelerationByMainThrusters*Math.cos(tilt) - GRAV_EARTH);
+	    		accY = accelerationByMainThrusters*Math.cos(tilt) - GRAV_EARTH;
 	    	}
-	        return this.acceleration.getY();
+	    	System.out.println("newly calculated acc x is: " + accY);
+	        return accY;
 	    }
 
 	    public double calculateRotationAcceleration(){
 	        this.angularAcceleration = torque;
 	        return angularAcceleration;
+	    }
+	    
+	    public void addAccelerationByMainThrusters() {
+	    	this.acceleration.x = this.acceleration.x + this.calculateXAcceleration();
+	    	this.acceleration.y = this.acceleration.y + this.calculateYAcceleration();
 	    }
 
 	    //By choosing realistic values for the power of the thrusters we can now calculate the acceleration
@@ -254,6 +263,7 @@ public class SpaceShip extends Wind {
 	    public void recalculateVelocity(double timeSlice) {
 	    	this.velocity.x = this.getVelocity().x + this.getAcceleration().x * timeSlice;
 	    	this.velocity.y = this.getVelocity().y + this.getAcceleration().y * timeSlice;
+	    	System.out.println("x acc: " + acceleration.x + ", y acc " + acceleration.y);
 	    }
 	    
 	    public void recalculateLocation(double timeSlice) {
