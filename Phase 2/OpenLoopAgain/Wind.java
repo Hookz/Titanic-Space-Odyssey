@@ -26,6 +26,7 @@ public class Wind {
         double windSpeed = (119.7 / 120) * kmFromSurface + 0.3;
 
         //Since the maximum windspeed according to California institute for technology was 120 m/s, we cap it there
+        //for earth this is going to be the maximum as well
         if (windSpeed>100) {
             windSpeed = 100;
         }

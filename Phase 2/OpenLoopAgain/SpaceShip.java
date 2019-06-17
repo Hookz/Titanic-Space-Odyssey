@@ -22,7 +22,7 @@ public class SpaceShip extends Wind {
 	private double angularVelocity = 0; // rad/s
 	private double angularAcceleration = 0; //rad/sec^2
 	private double torque = 0; //provided by the side thrusters - also known as v - in newton
-	private double accelerationByMainThrusters = 0; //by the main - also known as u
+	private double accelerationByMainThrusters = 0; //by the main - also known as u - in newton
 	
 	//constants
 	protected static final double GRAV_TITAN = 1.352; //acceleration due to gravity on titan, in m/s^2
@@ -219,18 +219,17 @@ public class SpaceShip extends Wind {
 	    //use the mass and distance to titan to calculate the acceleration
 	    public void addAccelerationByGravityForceTitan() {
 	        //Vector2D grav = new Vector2D(0, this.getGravity());
-	    	Vector2D grav = new Vector2D(0, GRAV_TITAN * mass); //the force
+	    	Vector2D grav = new Vector2D(0, -(GRAV_TITAN * mass)); //the force
 	        addAccelerationByForce(grav);
 	    }
 	    
 	    public void addAccelerationByGravityForceEarth() {
-	    	Vector2D grav = new Vector2D(0, GRAV_EARTH * mass);
+	    	Vector2D grav = new Vector2D(0, -(GRAV_EARTH * mass));
 	    	addAccelerationByForce(grav);
 	    }
 
-	    //add the air resistance to this spaceship
+	    //add simple air resistance to this spaceship
 	    public void addAirResistance() {
-	        //without using tilt or anything
 	    	double resisX, resisY;
 	    	if (titan) {
 	    		resisX = 0.5 * DRAG_CO * DENSITY_TITAN * (this.height * this.width) * this.velocity.getX();
@@ -240,7 +239,7 @@ public class SpaceShip extends Wind {
 	    		resisX = 0.5 * DRAG_CO * DENSITY_EARTH * (this.height * this.width) * this.velocity.getX();
 	    		resisY = 0.5 * DRAG_CO * DENSITY_EARTH * (this.width * this.width) * this.velocity.getY();
 	    	}
-	        Vector2D resistance = new Vector2D(-resisX, -resisY);
+	        Vector2D resistance = new Vector2D(resisX, resisY);
 	        addAccelerationByForce(resistance);
 
 	    }
@@ -251,12 +250,26 @@ public class SpaceShip extends Wind {
 	        accByForce.div(mass);
 	        acceleration.add(accByForce);
 	    }	     
+	    
+	    public void recalculateVelocity(double timeSlice) {
+	    	this.velocity.x = this.getVelocity().x + this.getAcceleration().x * timeSlice;
+	    	this.velocity.y = this.getVelocity().y + this.getAcceleration().y * timeSlice;
+	    }
+	    
+	    public void recalculateLocation(double timeSlice) {
+	    	recalculateVelocity(timeSlice);
+	    	
+	    	this.location.x = this.getXLocation() + velocity.x * timeSlice;
+	    	this.location.y = this.getYLocation() + velocity.y * timeSlice;
+	    	
+	    }
+	    
 
 	    //calculate whether the landing was successful
 	    public boolean successfuLanding() {
 	    	if (location.y <= 0) {
 	    		System.out.println("y = 0");
-	    		if(FINAL_ANGLE <= this.getTilt() && FINAL_ANGULAR_VELOCITY <= this.getAngularVelocity()) {
+	    		if(FINAL_ANGLE <= (this.getTilt()%(2*Math.PI)) && FINAL_ANGULAR_VELOCITY <= this.getAngularVelocity()) {
 	    			System.out.println("alse: tilt is within bounds");
 	    			if (Math.abs(this.location.x) <= LANDING_X_TOLERANCE) {
 	    				System.out.print("also: x location is good");
@@ -268,6 +281,7 @@ public class SpaceShip extends Wind {
 	    			}
 	    		}
 	    	}
+	    	System.out.println("landing failed");
 	    	return false;
 	    }
 	    
