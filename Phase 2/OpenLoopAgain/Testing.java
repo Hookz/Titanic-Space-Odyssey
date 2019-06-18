@@ -10,7 +10,7 @@ public class Testing {
 		double width = 4;
 		boolean titan = true;
 		double g = SpaceShip.GRAV_TITAN;
-		long timeSlice = 1;
+		long timeSlice = 1;//sec
 		
 		SpaceShip spaceShip = new SpaceShip(10000, velocity, acceleration, location, height, width, titan );
 		SpaceShip spaceShip2 = new SpaceShip(10000, velocity.clone(), acceleration.clone(), location.clone(), height, width, titan);
@@ -26,7 +26,7 @@ public class Testing {
 				System.out.println("velocity y is " + spaceShip.getVelocity().y);
 		}
 		
-		
+		/*
 		while (spaceShip2.getYLocation() > 0) {
 			landingTitan2.update(timeSlice);
 			System.out.println("location x is " + spaceShip2.getLocation().x);
@@ -34,5 +34,6 @@ public class Testing {
 			System.out.println("velocity x is " + spaceShip2.getVelocity().x);
 			System.out.println("velocity y is " + spaceShip2.getVelocity().y);
 		}
+	*/
 	}
 }

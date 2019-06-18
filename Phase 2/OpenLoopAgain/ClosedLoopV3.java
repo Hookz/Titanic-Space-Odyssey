@@ -51,17 +51,8 @@ public class ClosedLoopV3 {
 			spaceship.setAccelerationByMainThrusters(2);
 		}
 		
-		if(titan) {
-			spaceship.addAccelerationByGravityForceTitan();
-		}
-		else {
-			spaceship.addAccelerationByGravityForceEarth();
-		}
-		
-		spaceship.addAccelerationByMainThrusters();
-		if (spaceship.getYLocation() > 0) {
-		spaceship.addAccelerationByForce(new Vector2D(wind.get((int) (kmToGo - spaceship.getYLocation() / 1000 + 1)), 0));
-		}
+		spaceship.addAccelerationByMainThrusters(timeSlice);
+		spaceship.addAccelerationBySideThrusters(timeSlice);
 		
 		spaceship.recalculateLocation(timeSlice);
 		

@@ -189,6 +189,24 @@ public class SpaceShip extends Wind {
 	    //after this, methods to calculate different forces/accelerations
 	    
 
+	    public double calculateRotationAcceleration(){
+	        this.angularAcceleration = torque;
+	        return angularAcceleration;
+	    }
+	    
+	    public void calculateCurrentTilt(double timeStep) {
+	    	this.tilt = this.tilt + this.angularVelocity * timeStep;
+	    }
+	    
+	    public void addAccelerationBySideThrusters(double timeStep) {
+	    	this.angularVelocity = this.angularVelocity + this.calculateRotationAcceleration() * timeStep;
+	    }
+	    
+	    public void addAccelerationByMainThrusters(double timeStep) {
+	    	this.acceleration.x = this.acceleration.x + timeStep * this.calculateXAcceleration();
+	    	this.acceleration.y = this.acceleration.y + timeStep * this.calculateYAcceleration();
+	    }
+
 	    //These are formulae for the acceleration
 	    public double calculateXAcceleration(/*double rotationInRads, double accelerationThruster*/){
 	        //this.acceleration.setX(accelerationThruster*Math.sin(rotationInRads));
@@ -210,21 +228,12 @@ public class SpaceShip extends Wind {
 	    	System.out.println("newly calculated acc x is: " + accY);
 	        return accY;
 	    }
-
-	    public double calculateRotationAcceleration(){
-	        this.angularAcceleration = torque;
-	        return angularAcceleration;
-	    }
 	    
-	    public void addAccelerationByMainThrusters() {
-	    	this.acceleration.x = this.acceleration.x + this.calculateXAcceleration();
-	    	this.acceleration.y = this.acceleration.y + this.calculateYAcceleration();
-	    }
-
 	    //By choosing realistic values for the power of the thrusters we can now calculate the acceleration
 
 	    //the wind needs to be added in the openloop, as it needs to be the same for the timesteps
 	    
+	    /*
 	    //use the mass and distance to titan to calculate the acceleration
 	    public void addAccelerationByGravityForceTitan() {
 	        //Vector2D grav = new Vector2D(0, this.getGravity());
@@ -236,6 +245,7 @@ public class SpaceShip extends Wind {
 	    	Vector2D grav = new Vector2D(0, -(GRAV_EARTH * mass));
 	    	addAccelerationByForce(grav);
 	    }
+	    
 
 	    //add simple air resistance to this spaceship
 	    public void addAirResistance() {
@@ -259,6 +269,7 @@ public class SpaceShip extends Wind {
 	        accByForce.div(mass);
 	        acceleration.add(accByForce);
 	    }	     
+	    */
 	    
 	    public void recalculateVelocity(double timeSlice) {
 	    	this.velocity.x = this.getVelocity().x + this.getAcceleration().x * timeSlice;
@@ -267,6 +278,7 @@ public class SpaceShip extends Wind {
 	    }
 	    
 	    public void recalculateLocation(double timeSlice) {
+	    	this.calculateCurrentTilt(timeSlice);
 	    	recalculateVelocity(timeSlice);
 	    	
 	    	this.location.x = this.getXLocation() + velocity.x * timeSlice;
