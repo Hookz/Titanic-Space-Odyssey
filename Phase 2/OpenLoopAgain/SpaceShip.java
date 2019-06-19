@@ -185,7 +185,6 @@ public class SpaceShip extends Wind {
 	    
 	    //end of setters and getters
 		
-		
 	    //after this, methods to calculate different forces/accelerations
 	    
 
@@ -199,19 +198,19 @@ public class SpaceShip extends Wind {
 	    }
 	    
 	    public void addAccelerationBySideThrusters(double timeStep) {
-	    	this.angularVelocity = this.angularVelocity + this.calculateRotationAcceleration() * timeStep;
+	    	this.angularVelocity = this.calculateRotationAcceleration() * timeStep;
 	    }
 	    
 	    public void addAccelerationByMainThrusters(double timeStep) {
-	    	this.acceleration.x = this.acceleration.x + timeStep * this.calculateXAcceleration();
-	    	this.acceleration.y = this.acceleration.y + timeStep * this.calculateYAcceleration();
+	    	this.acceleration.x = timeStep * this.calculateXAcceleration();
+	    	this.acceleration.y = timeStep * this.calculateYAcceleration();
 	    }
 
 	    //These are formulae for the acceleration
 	    public double calculateXAcceleration(/*double rotationInRads, double accelerationThruster*/){
 	        //this.acceleration.setX(accelerationThruster*Math.sin(rotationInRads));
 	    	double accX = accelerationByMainThrusters * Math.sin(tilt);
-	    	System.out.println("newly calculated acc x is:" +  accX);
+	    	//System.out.println("newly calculated acc x is:" +  accX);
 	        return accX;
 	    }
 
@@ -225,7 +224,7 @@ public class SpaceShip extends Wind {
 	    	else {
 	    		accY = accelerationByMainThrusters*Math.cos(tilt) - GRAV_EARTH;
 	    	}
-	    	System.out.println("newly calculated acc x is: " + accY);
+	    	//System.out.println("newly calculated acc y is: " + accY);
 	        return accY;
 	    }
 	    
@@ -233,48 +232,12 @@ public class SpaceShip extends Wind {
 
 	    //the wind needs to be added in the openloop, as it needs to be the same for the timesteps
 	    
-	    /*
-	    //use the mass and distance to titan to calculate the acceleration
-	    public void addAccelerationByGravityForceTitan() {
-	        //Vector2D grav = new Vector2D(0, this.getGravity());
-	    	Vector2D grav = new Vector2D(0, -(GRAV_TITAN * mass)); //the force
-	        addAccelerationByForce(grav);
-	    }
-	    
-	    public void addAccelerationByGravityForceEarth() {
-	    	Vector2D grav = new Vector2D(0, -(GRAV_EARTH * mass));
-	    	addAccelerationByForce(grav);
-	    }
-	    
-
-	    //add simple air resistance to this spaceship
-	    public void addAirResistance() {
-	    	double resisX, resisY;
-	    	if (titan) {
-	    		resisX = 0.5 * DRAG_CO * DENSITY_TITAN * (this.height * this.width) * this.velocity.getX();
-	    		resisY = 0.5 * DRAG_CO * DENSITY_TITAN * (this.width * this.width) * this.velocity.getY();
-	    	}
-	    	else {
-	    		resisX = 0.5 * DRAG_CO * DENSITY_EARTH * (this.height * this.width) * this.velocity.getX();
-	    		resisY = 0.5 * DRAG_CO * DENSITY_EARTH * (this.width * this.width) * this.velocity.getY();
-	    	}
-	        Vector2D resistance = new Vector2D(resisX, resisY);
-	        addAccelerationByForce(resistance);
-
-	    }
-
-	    //add a force vector on the spaceship
-	    public void addAccelerationByForce(Vector2D force) {
-	        Vector2D accByForce = new Vector2D(force);
-	        accByForce.div(mass);
-	        acceleration.add(accByForce);
-	    }	     
-	    */
+	   
 	    
 	    public void recalculateVelocity(double timeSlice) {
-	    	this.velocity.x = this.getVelocity().x + this.getAcceleration().x * timeSlice;
-	    	this.velocity.y = this.getVelocity().y + this.getAcceleration().y * timeSlice;
-	    	System.out.println("x acc: " + acceleration.x + ", y acc " + acceleration.y);
+	    	this.velocity.x = this.getVelocity().x + /*this.getAcceleration().x * timeSlice;*/  this.calculateXAcceleration() * timeSlice;
+	    	this.velocity.y = this.getVelocity().y + /*this.getAcceleration().y * timeSlice;*/ this.calculateYAcceleration() *timeSlice;
+	    	//System.out.println("x acc: " + acceleration.x + ", y acc " + acceleration.y);
 	    }
 	    
 	    public void recalculateLocation(double timeSlice) {
@@ -292,7 +255,7 @@ public class SpaceShip extends Wind {
 	    	if (location.y <= 0) {
 	    		System.out.println("y = 0");
 	    		if(FINAL_ANGLE <= (this.getTilt()%(2*Math.PI)) && FINAL_ANGULAR_VELOCITY <= this.getAngularVelocity()) {
-	    			System.out.println("alse: tilt is within bounds");
+	    			System.out.println("also: tilt is within bounds");
 	    			if (Math.abs(this.location.x) <= LANDING_X_TOLERANCE) {
 	    				System.out.print("also: x location is good");
 	    				if (Math.abs(this.velocity.x) <= FINAL_X_VELOCITY && Math.abs(this.velocity.y) <= FINAL_Y_VELOCITY) {
@@ -320,7 +283,47 @@ public class SpaceShip extends Wind {
 	    	return String.format("Years:%08d, Days:%03d, Hours:%02d, Minutes:%02d, Seconds:%02d", years, days, hours, minutes, seconds);
 	    }
 
-	    public void addPassedTime(long timeSlice) {
-	    	elapsedSeconds =+ timeSlice;
+	    public void addPassedTime(double timeSlice) {
+	    	elapsedSeconds =+ (long) timeSlice;
 	    }
 }
+
+
+/*
+//use the mass and distance to titan to calculate the acceleration
+public void addAccelerationByGravityForceTitan() {
+    //Vector2D grav = new Vector2D(0, this.getGravity());
+	Vector2D grav = new Vector2D(0, -(GRAV_TITAN * mass)); //the force
+    addAccelerationByForce(grav);
+}
+
+public void addAccelerationByGravityForceEarth() {
+	Vector2D grav = new Vector2D(0, -(GRAV_EARTH * mass));
+	addAccelerationByForce(grav);
+}
+
+
+//add simple air resistance to this spaceship
+public void addAirResistance() {
+	double resisX, resisY;
+	if (titan) {
+		resisX = 0.5 * DRAG_CO * DENSITY_TITAN * (this.height * this.width) * this.velocity.getX();
+		resisY = 0.5 * DRAG_CO * DENSITY_TITAN * (this.width * this.width) * this.velocity.getY();
+	}
+	else {
+		resisX = 0.5 * DRAG_CO * DENSITY_EARTH * (this.height * this.width) * this.velocity.getX();
+		resisY = 0.5 * DRAG_CO * DENSITY_EARTH * (this.width * this.width) * this.velocity.getY();
+	}
+    Vector2D resistance = new Vector2D(resisX, resisY);
+    addAccelerationByForce(resistance);
+
+}
+
+//add a force vector on the spaceship
+public void addAccelerationByForce(Vector2D force) {
+    Vector2D accByForce = new Vector2D(force);
+    accByForce.div(mass);
+    acceleration.add(accByForce);
+}	     
+*/
+
