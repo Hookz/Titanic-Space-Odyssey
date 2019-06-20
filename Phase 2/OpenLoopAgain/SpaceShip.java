@@ -186,7 +186,6 @@ public class SpaceShip extends Wind {
 	    //end of setters and getters
 		
 	    //after this, methods to calculate different forces/accelerations
-	    
 
 	    public double calculateRotationAcceleration(){
 	        this.angularAcceleration = torque;
@@ -194,16 +193,17 @@ public class SpaceShip extends Wind {
 	    }
 	    
 	    public void calculateCurrentTilt(double timeStep) {
+	    	calculateRotationAcceleration();
 	    	this.tilt = this.tilt + this.angularVelocity * timeStep;
 	    }
 	    
 	    public void addAccelerationBySideThrusters(double timeStep) {
-	    	this.angularVelocity = this.calculateRotationAcceleration() * timeStep;
+	    	this.angularVelocity = this.angularVelocity + this.calculateRotationAcceleration() * timeStep;
 	    }
 	    
-	    public void addAccelerationByMainThrusters(double timeStep) {
-	    	this.acceleration.x = timeStep * this.calculateXAcceleration();
-	    	this.acceleration.y = timeStep * this.calculateYAcceleration();
+	    public void addAccelerationByMainThrusters() {
+	    	this.acceleration.x = this.calculateXAcceleration();
+	    	this.acceleration.y = this.calculateYAcceleration();
 	    }
 
 	    //These are formulae for the acceleration
@@ -231,7 +231,6 @@ public class SpaceShip extends Wind {
 	    //By choosing realistic values for the power of the thrusters we can now calculate the acceleration
 
 	    //the wind needs to be added in the openloop, as it needs to be the same for the timesteps
-	    
 	   
 	    
 	    public void recalculateVelocity(double timeSlice) {
@@ -244,9 +243,8 @@ public class SpaceShip extends Wind {
 	    	this.calculateCurrentTilt(timeSlice);
 	    	recalculateVelocity(timeSlice);
 	    	
-	    	this.location.x = this.getXLocation() + velocity.x * timeSlice;
-	    	this.location.y = this.getYLocation() + velocity.y * timeSlice;
-	    	
+	    	this.location.x = this.location.x + velocity.x * timeSlice;
+	    	this.location.y = this.location.y + velocity.y * timeSlice;	
 	    }
 	    
 
