@@ -398,7 +398,9 @@ public class Main2 extends Application {
         goalLabel.setText("Pending...");
     }*/
 
+
     public static void main(String[] args) {
+
         launch(args);
     }
 
