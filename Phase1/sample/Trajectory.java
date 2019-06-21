@@ -149,7 +149,7 @@ public class Trajectory {
         String landingDate = null;
         //find min distance between the interval
 
-        for(int i = 1; i < titanPositions.size(); i++) {
+        for(int i = 5; i < titanPositions.size(); i++) {
             double distance = titanPositions.get(i).distance(earthPositions.get(i-5));
 
             if(distance < minDistance) {

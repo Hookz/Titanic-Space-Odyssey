@@ -2,7 +2,16 @@ package sample;
 
 
 import java.sql.Time;
-
+//TODO
+/**
+ * info for adding to GUI:
+ * time of launch from EarthToTitan and TitanToEarth given by Trajectory.launchToTitan and Trajectory.launchToEarth, respectively
+ * both above given in seconds and are public in Trajectory class
+ * elapsedSeconds in main or of current bodysystem gives time of the system.
+ * IDEA: while time is between launch and land use calculateVelocityFromThrust
+ * POSSIBLE ISSUE: Velocity does not reach 0 when approaching titan(doesn't slow down at all)
+ * POSSIBLE ISSUE: overlap with land on titan and launch from titan times as they follow each other instantly
+ */
 public class RocketModel {
     public static final double MASS_EMPTY =100000; //mass w/out fuel kg
     public static final double THRUST_AT_SL = 6770000; //N thrust at sea level(Rocketdyne f-1: Saturn V's rocket engine calculated with specific Impulse)
@@ -41,21 +50,19 @@ public class RocketModel {
     public void calculateVelocityFromThrust(final Vector3D directionVector, final long timeSlice){
         Vector3D directionUnitVector;
         double speedToReach = speedToReach(directionVector.length());
-
-
         System.out.println((THRUST_AT_VACUUM*timeSlice)/(massOfFuel+MASS_EMPTY));
-        if (velocity.length()<speedToReach) {
+        while (velocity.length()<speedToReach || secondsOfThrust<=timeSlice) {
             directionUnitVector = directionVector.normalize();
             if (inSpace) {
                 directionUnitVector.mul((THRUST_AT_VACUUM*timeSlice)/(massOfFuel+MASS_EMPTY));
                 velocity.add(directionUnitVector);
                 massOfFuel -= (FUEL_MASS_FLOW_RATE);
-                secondsOfThrust+= timeSlice;
+                secondsOfThrust++;
             } else {
                 directionUnitVector.mul((THRUST_AT_SL*timeSlice)/(massOfFuel+MASS_EMPTY));
                 velocity.add(directionUnitVector);
                 massOfFuel -= (FUEL_MASS_FLOW_RATE);
-                secondsOfThrust+=timeSlice;
+                secondsOfThrust++;
             }
         }updateLocation(velocity, timeSlice);
         System.out.println(this.velocity.length());
