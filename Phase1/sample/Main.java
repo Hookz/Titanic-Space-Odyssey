@@ -30,7 +30,7 @@ import java.util.ArrayList;
 
 public class Main extends Application {
     //second to update the model(deltaT)
-    public final double TIME_SLICE = 200;
+    public final long TIME_SLICE = 210;
 
     //initial zoom
     public static final double INITIAL_SCALE = 6e9;
@@ -60,10 +60,13 @@ public class Main extends Application {
     private int currentSystem = 0;
     private Button playBackButton;
     private boolean change = false;
-    
+    private RocketModel r;
+
     @Override
     public void start(Stage stage) {
         createBodies();
+        Trajectory.pleaseJustRun();
+        RocketModel r = new RocketModel(null, Trajectory.earthToTitan, Trajectory.titanToEarth);
         transformer.setScale(INITIAL_SCALE);
         transformer.setOriginXForOther(500);
         transformer.setOriginYForOther(500);
@@ -71,12 +74,12 @@ public class Main extends Application {
         Timeline timeline = new Timeline();
         timeline.setCycleCount(Timeline.INDEFINITE);
         KeyFrame kf = new KeyFrame(
-                Duration.millis(0.1),
-                new EventHandler<ActionEvent>() {
-                    public void handle(ActionEvent ae) {
-                        updateFrame(gc);
-                    }
-                });
+            Duration.millis(0.1),
+            new EventHandler<ActionEvent>() {
+                public void handle(ActionEvent ae) {
+                    updateFrame(gc);
+                }
+            });
         timeline.getKeyFrames().add(kf);
         timeline.play();
         stage.show();
@@ -88,21 +91,35 @@ public class Main extends Application {
         gc.clearRect(0, 0, canvasWidth, canvasHeight);
         gc.setFill(Color.LIGHTBLUE); //can be another color
         gc.fillRect(0, 0, canvasWidth, canvasHeight);
-        
+
         if (change) {
-        	if (currentSystem>0) {	
-        		int tryFor = bodySystem.getBodies().size();
-        		bodySystem.getBodies().clear();
-        		for (int i = 0; i <tryFor; i++) {
-        			bodySystem.getBodies().add(oldSystems.get(currentSystem-1).getBodies().get(i).copy());
-        			bodySystem.setSeconds(oldSystems.get(currentSystem-1).getSeconds());
-        			timeLabel.setText(bodySystem.getElapsedTimeAsString());
-        		}
-        		currentSystem--;
-        	}
-        	change = false;
+            if (currentSystem>0) {
+                int tryFor = bodySystem.getBodies().size();
+                bodySystem.getBodies().clear();
+                for (int i = 0; i <tryFor; i++) {
+                    bodySystem.getBodies().add(oldSystems.get(currentSystem-1).getBodies().get(i).copy());
+                    bodySystem.setSeconds(oldSystems.get(currentSystem-1).getSeconds());
+                    timeLabel.setText(bodySystem.getElapsedTimeAsString());
+                }
+                currentSystem--;
+            }
+            change = false;
         }
-        
+
+
+        if(bodySystem.getSeconds()>Trajectory.launchToTitan && Trajectory.landOnTitan<bodySystem.getSeconds()){
+            r.location =bodySystem.getBodies().get(4).getLocation();
+            r.calculateVelocityFromThrust(r.earthToTitan, TIME_SLICE);
+            gc.setFill(Color.BLACK);
+            gc.fillOval(r.location.x - 3, r.location.y - 3, 3*2, 3* 2);
+        }else if(bodySystem.getSeconds()>Trajectory.launchToEarth && Trajectory.landOnEarth<bodySystem.getSeconds()){
+            r.location = bodySystem.getBodies().get(10).getLocation();
+            r.calculateVelocityFromThrust(r.titanToEarth, TIME_SLICE);
+            gc.setFill(Color.BLACK);
+            gc.fillOval(r.location.x - 3, r.location.y - 3, 3*2, 3* 2);
+
+        }
+
         for (Body body : bodySystem.getBodies()) {
 
 /*
@@ -127,14 +144,15 @@ public class Main extends Application {
             Text text = new Text(body.name);
             gc.fillText(body.name, otherX - (text.getLayoutBounds().getWidth() / 2), otherY - BODY_RADIUS - (text.getLayoutBounds().getHeight() / 2));
         }
-         
+
         if (!paused) {
             bodySystem.update(TIME_SLICE);
             timeLabel.setText(bodySystem.getElapsedTimeAsString());
             if(bodySystem.getSeconds()% (60*60*24*365) == 0) {//every year
-            	oldSystems.add(bodySystem.copy());
-            	currentSystem++;
+                oldSystems.add(bodySystem.copy());
+                currentSystem++;
             }
+
         }
         fpsLabel.setText("FPS: " + fps.countFrame());
         scaleLabel.setText(String.format("Scale: %d km/pixel", Math.round(transformer.getScale()/1000)));
@@ -153,7 +171,7 @@ public class Main extends Application {
         border.setBottom(hbox);
         HBox top = createHBoxTwo();
         border.setTop(top);
-        
+
         Canvas canvas = createCanvas();
         border.setCenter(canvas);
         stage.setTitle("Solar System using N-Body");
@@ -197,22 +215,22 @@ public class Main extends Application {
     private HBox createHBox() {
         HBox hbox = new HBox();
         HBox buttons = new HBox();
-        
+
         createPauseButton();
         createFastForwardHalfButton();
         createFastForwardYearButton();
         createPlayBackButton();
-        
+
         buttons.setPadding(new Insets(10, 10, 10, 10));
         buttons.setSpacing(5);
         buttons.setStyle("-fx-background-color: #336699;");
         buttons.setFillHeight(true);
-        
+
         buttons.getChildren().add(playBackButton);
         buttons.getChildren().add(pauseButton);
         buttons.getChildren().add(fastForwardHalfButton);
         buttons.getChildren().add(fastForwardYearButton);
-        
+
         hbox.setPadding(new Insets(15, 12, 15, 12));
         hbox.setSpacing(10);   // Gap between nodes
         hbox.setStyle("-fx-background-color: #336699;");
@@ -225,87 +243,87 @@ public class Main extends Application {
     }
 
     private HBox createHBoxTwo() {
-    	HBox hbox = new HBox();
-    	
-    	Label title = new Label();
-    	title.setText("Model of the Solar System");
-    	title.setFont(new Font("Serif", 40));
-    	title.setTextFill(Color.WHITE);
-    	
-    	hbox.getChildren().add(title);
-    	hbox.setPadding(new Insets(15, 12, 15, 12));
+        HBox hbox = new HBox();
+
+        Label title = new Label();
+        title.setText("Model of the Solar System");
+        title.setFont(new Font("Serif", 40));
+        title.setTextFill(Color.WHITE);
+
+        hbox.getChildren().add(title);
+        hbox.setPadding(new Insets(15, 12, 15, 12));
         hbox.setSpacing(10);
         hbox.setStyle("-fx-background-color: #336699;");
         hbox.setFillHeight(true);
-    	return hbox;
+        return hbox;
     }
-    
+
     private void createPauseButton() {
-    	pauseButton = new Button();
-    	pauseButton.setText("Play");
-    	pauseButton.setFont(new Font("Serif", 16));
-    	pauseButton.setOnAction(new EventHandler<ActionEvent>() {
+        pauseButton = new Button();
+        pauseButton.setText("Play");
+        pauseButton.setFont(new Font("Serif", 16));
+        pauseButton.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
                 if (paused) {
-                	paused = false;
-                	pauseButton.setText("Pause");
+                    paused = false;
+                    pauseButton.setText("Pause");
                 }
                 else {
-                	paused = true;
-                	pauseButton.setText("Play");
+                    paused = true;
+                    pauseButton.setText("Play");
                 }
             }
         });
-    	
+
     }
-    
+
     private void createFastForwardHalfButton() {
-    	fastForwardHalfButton = new Button();
-    	fastForwardHalfButton.setText("Skip 1/2 year");
-    	fastForwardHalfButton.setFont(new Font("Serif", 16));
-    	fastForwardHalfButton.setOnAction(new EventHandler<ActionEvent>() {
+        fastForwardHalfButton = new Button();
+        fastForwardHalfButton.setText("Skip 1/2 year");
+        fastForwardHalfButton.setFont(new Font("Serif", 16));
+        fastForwardHalfButton.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
-            	for (int i = 0; i < (60*60*24*365*0.5)/TIME_SLICE; i++) {
-    				bodySystem.update(TIME_SLICE);
-    				timeLabel.setText(bodySystem.getElapsedTimeAsString());
+                for (int i = 0; i < (60*60*24*365*0.5)/TIME_SLICE; i++) {
+                    bodySystem.update(TIME_SLICE);
+                    timeLabel.setText(bodySystem.getElapsedTimeAsString());
                     if (bodySystem.getSeconds() % (60*60*24*365) == 0) {
-    	            	oldSystems.add(bodySystem.copy());
-    	            	currentSystem++;
-    	            }
-    			}
+                        oldSystems.add(bodySystem.copy());
+                        currentSystem++;
+                    }
+                }
             }
         });
     }
-    
+
     private void createFastForwardYearButton() {
-    	fastForwardYearButton = new Button();
-    	fastForwardYearButton.setText("Skip 3 years");
-    	fastForwardYearButton.setFont(new Font("Serif", 16));
-    	fastForwardYearButton.setOnAction(new EventHandler<ActionEvent>() {
-    		public void handle(ActionEvent e) {
-    			for (int i = 0; i <(60*60*24*365*3)/TIME_SLICE; i++) {
-    				bodySystem.update(TIME_SLICE);
-    				timeLabel.setText(bodySystem.getElapsedTimeAsString());
+        fastForwardYearButton = new Button();
+        fastForwardYearButton.setText("Skip 3 years");
+        fastForwardYearButton.setFont(new Font("Serif", 16));
+        fastForwardYearButton.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                for (int i = 0; i <(60*60*24*365*3)/TIME_SLICE; i++) {
+                    bodySystem.update(TIME_SLICE);
+                    timeLabel.setText(bodySystem.getElapsedTimeAsString());
                     if (bodySystem.getSeconds() % (60*60*24*365) == 0) {
-    	            	oldSystems.add(bodySystem.copy());
-    	            	currentSystem++;
-    	            }
-    			}
-    		}
-    	});
+                        oldSystems.add(bodySystem.copy());
+                        currentSystem++;
+                    }
+                }
+            }
+        });
     }
-    
+
     private void createPlayBackButton() {
-    	playBackButton = new Button();
-    	playBackButton.setText("Rewind 1 year");
-    	playBackButton.setFont(new Font("Serif", 16));
-    	playBackButton.setOnAction(new EventHandler<ActionEvent>() {
-    		public void handle(ActionEvent e) {
-    			change = true;
-    		}
-    	});
+        playBackButton = new Button();
+        playBackButton.setText("Rewind 1 year");
+        playBackButton.setFont(new Font("Serif", 16));
+        playBackButton.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                change = true;
+            }
+        });
     }
-    
+
     private void createTimeLabel() {
         timeLabel = new Label();
         timeLabel.setPrefSize(500, 20);
@@ -328,19 +346,6 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        RocketModel r = new RocketModel(SpaceObject.EARTH, SpaceObject.TITAN, SpaceObject.SUN);
-        System.out.println(r.aTranfer());
-        System.out.println(r.peroidOfTransfer());
-        System.out.println(r.earthVelocity());
-        System.out.println(r.titanVelocity());
-        System.out.println(r.velocityPerihelion());
-        System.out.println(r.velocityAphelion());
-        System.out.println(r.deltaV1());
-        System.out.println(r.deltaV2());
-        //scale this and comment on what the measurements are.  Even I'm confused.
-        System.out.println(r.timeOfFlight()); //au to seconds.  Yikes.
-        System.out.println(r.driftPeriod()); //au to seconds.  Yikes.
-        System.out.println(r.degreeNeeded());
         launch(args);
     }
 

@@ -106,4 +106,10 @@ public class Vector3D {
     	return copy;
     }
 
+
+    public void print(){
+        System.out.println("x= "+this.x);
+        System.out.println("y= "+this.y);
+        System.out.println("z= "+this.z);
+    }
 }

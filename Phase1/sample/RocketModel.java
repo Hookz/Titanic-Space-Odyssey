@@ -1,76 +1,97 @@
 package sample;
 
-import static sample.SpaceObject.SUN;
-//Earth to Saturn
-//Saturn to Titan
-//just use: https://trajbrowser.arc.nasa.gov/traj_browser.php?NEOs=on&NEAs=on&NECs=on&chk_maxMag=on&maxMag=25&chk_maxOCC=on&maxOCC=4&chk_target_list=on&target_list=Titan&mission_class=oneway&mission_type=rendezvous&LD1=2014&LD2=2016&maxDT=2.0&DTunit=yrs&maxDV=7.0&min=DV&wdw_width=0&submit=Search
-//theorems used: Vis-viva equation(extention of Kepler's 2nd law), Kepler's third law,
+
+import java.sql.Time;
+
 public class RocketModel {
+    public static final double MASS_EMPTY =100000; //mass w/out fuel kg
+    public static final double THRUST_AT_SL = 6770000; //N thrust at sea level(Rocketdyne f-1: Saturn V's rocket engine calculated with specific Impulse)
+    public static final double THRUST_AT_VACUUM = 7770000; //N thrust in a vacuum (Rocketdyne f-1: Saturn V's rocket engine calculated with specific Impulse)
+    public static final double FUEL_MASS_FLOW_RATE = 788; //kg/s fuel mass depletion at maximum thrust per second
+    public boolean inSpace = true;
+    public double massOfFuel = 4000000; // in kg
+    public Vector3D velocity;
+    public Vector3D location;
+    public Vector3D earthToTitan;
+    public Vector3D titanToEarth;
+    public long launchToTitan;
+    public long landOnTitan;
+    public long launchToEarth;
+    public long landOnEarth;
+    public long secondsOfThrust = 0;
 
-    public double deltaV;
-    public double earthToSun;
-    public double titanToSun;
-    public double earthVelocity;
-    public double titanVelocity;
-    public final double earthOrbitalPeriod = 31.6E+6;
-    public final double titanOrbitalPeriod = 93E+7; //using saturn orbit around sun for now.
-    public Vector3D Earth, Titan, Sun;
-
-    //data for Rocket
-
-    public RocketModel(SpaceObject Earth, SpaceObject Titan, SpaceObject Sun) {
-        //get the distances.
-        this.earthToSun = Earth.location.distance(Sun.location);
-        this.titanToSun = Titan.location.distance(Sun.location);
-        this.earthVelocity = earthVelocity();
-        this.titanVelocity = titanVelocity();
+    public RocketModel(Vector3D location, Vector3D finalEarth, Vector3D finalTitan) {
+        this.location = location;
+        this.earthToTitan = finalEarth;
+        this.titanToEarth = finalTitan;
+        this.inSpace = true;
+        this.velocity = new Vector3D(0,0,0);
     }
 
-    public double aTranfer(){
-        return (earthToSun + titanToSun) / 2;
+    /**
+     *
+     * @param directionVector vector of the direction in which thrust is to be applied.
+     * This method calculates the velocity by using the thrust for the implemented timestep
+     * by transforming the directional vector into a unit vector the undirectional magnitude of the thrust
+     * can be simply applied in the wanted direction
+     *
+     */
+
+    //TODO while below required speed -> thrust
+    public void calculateVelocityFromThrust(final Vector3D directionVector, final long timeSlice){
+        Vector3D directionUnitVector;
+        double speedToReach = speedToReach(directionVector.length());
+
+
+        System.out.println((THRUST_AT_VACUUM*timeSlice)/(massOfFuel+MASS_EMPTY));
+        if (velocity.length()<speedToReach) {
+            directionUnitVector = directionVector.normalize();
+            if (inSpace) {
+                directionUnitVector.mul((THRUST_AT_VACUUM*timeSlice)/(massOfFuel+MASS_EMPTY));
+                velocity.add(directionUnitVector);
+                massOfFuel -= (FUEL_MASS_FLOW_RATE);
+                secondsOfThrust+= timeSlice;
+            } else {
+                directionUnitVector.mul((THRUST_AT_SL*timeSlice)/(massOfFuel+MASS_EMPTY));
+                velocity.add(directionUnitVector);
+                massOfFuel -= (FUEL_MASS_FLOW_RATE);
+                secondsOfThrust+=timeSlice;
+            }
+        }updateLocation(velocity, timeSlice);
+        System.out.println(this.velocity.length());
+
+        System.out.println("Seconds of Thrust = "+secondsOfThrust);
+        System.out.println("____________________________________________");
+
     }
 
-    public double peroidOfTransfer(){
-        return Math.sqrt((4 * Math.pow(Math.PI,2) * aTranfer())/Physics.G*SUN.mass);
+    /**
+     *
+     * @param body the planet for which we will be in geostationary orbit. From this we will require mass and radius of the planet
+     * @param rotationalPeriod we want this to be the same as the body's rotation on its axis. This effectively removes relative movement  of our spaceShip to the surface of the body
+     * @return the height from the surface of the planet required for geostationary orbit
+     * this equation is derived from centripetal force acceleration: m1(v^2)/r and the gravitational force on a satellite: G*m1*m2/r^2
+     * this can be used to find the starting height for the lunar landing module.
+     */
+    public double calcGeostationaryOrbitHeight(final Body body, final double rotationalPeriod){
+        double r;
+        double m2 = body.mass;
+        r = Math.cbrt((Physics.G*m2*rotationalPeriod*rotationalPeriod)/(4*Math.PI*Math.PI));
+        r -= body.radius; //we remove the radius of the body we are orbiting as the above equation gives us the distance from the centre of gravity
+        return r;
     }
 
-    public double earthVelocity(){
-        return 2*Math.PI*earthToSun/earthOrbitalPeriod;
+    public void updateLocation(Vector3D averageVelocity, final long timeSlice) {
+        Vector3D locationByVelocity = new Vector3D(averageVelocity).mul(timeSlice);
+        location.add(locationByVelocity);
     }
 
-    public double titanVelocity(){
-        return 2*Math.PI*titanToSun/titanOrbitalPeriod;
+    //TODO implement required speed. S=v/t from SUVAT equations
+    public double speedToReach(final double distance){
+        double velocity;
+        double timeInSeconds = 60*60*24*365*2.5;
+        velocity = distance/timeInSeconds;
+        System.out.println("required Velocity= "+velocity);
+        return velocity;
     }
-
-    public double velocityPerihelion() {
-        return ((2*Math.PI * aTranfer())/peroidOfTransfer())*Math.sqrt((2*aTranfer()/earthToSun) -1);
-    }
-
-    public double velocityAphelion() {
-        return 2*Math.PI*aTranfer()/peroidOfTransfer()*Math.sqrt((2*aTranfer()/titanToSun)-1);
-    }
-    public double deltaV1(){
-        return velocityPerihelion() - earthVelocity;
-    }
-    public double deltaV2(){
-        return titanVelocity - velocityAphelion();
-    }
-
-    public double timeOfFlight(){
-        return ((1.0 / 2 * peroidOfTransfer())/86400)/365; //au to seconds.  Yikes.
-    }
-
-    //kepler's third law p^2=a^3
-    public double driftPeriod() {
-        return Math.sqrt(Math.pow(aTranfer(), 3))/3.154E+7; //au to seconds.  Yikes.
-    }
-
-    //angle need to attain launch
-    public double degreeNeeded() {
-        return -1 * (driftPeriod()/titanOrbitalPeriod * 360 - 180);
-    }
-
-//    public final double MARS_ORBITAL_PERIOD = 59.4E+6;
-//    public final double JUPITER_ORBITAL_PERIOD = 370E+6;
-//    public Vector3D Mars, Jupiter;
 }
