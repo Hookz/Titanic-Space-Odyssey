@@ -1,5 +1,7 @@
 package OpenLoopAgain;
 
+//can be deleted
+
 import java.util.ArrayList;
 
 public class ClosedLoopV3 {
@@ -51,7 +53,7 @@ public class ClosedLoopV3 {
 			spaceship.setAccelerationByMainThrusters(2);
 		}
 		
-		spaceship.addAccelerationByMainThrusters(timeSlice);
+		spaceship.addAccelerationByMainThrusters();
 		spaceship.addAccelerationBySideThrusters(timeSlice);
 		
 		spaceship.recalculateLocation(timeSlice);
