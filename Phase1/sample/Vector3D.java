@@ -48,6 +48,13 @@ public class Vector3D {
         }
         return this;
     }
+    
+    public Vector3D mulVec(Vector3D other) {
+    	this.x = other.x * this.x;
+    	this.y = other.y * this.y;
+    	this.z = other.z * this.z;
+    	return this;
+    }
 
     public Vector3D div(double factor) {
         if (x != 0) {

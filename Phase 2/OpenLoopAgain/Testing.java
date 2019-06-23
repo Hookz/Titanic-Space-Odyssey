@@ -36,5 +36,9 @@ public class Testing {
 				timePassed = timePassed + timeSlice;
 		}
 		*/
+		
+		for (int i = 0; i < landingTitan.getLocations().size(); i++) {
+			System.out.println(" x = " + landingTitan.getLocations().get(i).x + " y = " + landingTitan.getLocations().get(i).y);
+		}
 	}
 }

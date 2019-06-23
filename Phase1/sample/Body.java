@@ -67,19 +67,21 @@ public class Body {
     public void resetAcceleration() {
         acceleration = new Vector3D();
     }
-
+    
     //calculates new velocity and update new location
     public void updateVelocityAndLocation(double timeSlice) {
         // caluclate final velocity when the time slice has occurred
         Vector3D oldVelocity = new Vector3D(this.velocity);
         updateVelocity(timeSlice);
-
-        // updateVelocityAndLocation location using average velocity
+    	
+    	//updateVelocityAndLocationRK4(timeSlice); //when runga kutta is used
+    	
+        //updateVelocityAndLocation location using average velocity
         Vector3D changedVelocityAverage = new Vector3D(this.velocity).sub(oldVelocity).div(2.0);
         Vector3D averageVelocity = new Vector3D(oldVelocity).add(changedVelocityAverage);
         updateLocation(timeSlice, averageVelocity);
     }
-
+	
     //gravity between this and another object
     protected Vector3D calculateGravitationalForce(Body other) {
         // get direction vector
@@ -95,7 +97,8 @@ public class Body {
 
         return grativationalForce;
     }
-
+    
+     //does not use runga kutta
     //calculates the last of the accumilated velocity.
     protected void updateVelocity(double timeSlice) {
         Vector3D velocityByAcc = new Vector3D(acceleration).mul(timeSlice);
@@ -108,6 +111,27 @@ public class Body {
         location.add(locationByVelocity);
     }
 
+    protected void updateVelocityAndLocationRK4(double timeSlice) {
+    	Vector3D kOneLoc = this.velocity.copy();
+    	Vector3D kOneVel = (this.acceleration.copy()).mulVec((this.location.copy()));
+    	
+    	Vector3D kTwoLoc = this.velocity.copy().mulVec(kOneVel.copy().mul(timeSlice / 2));
+    	Vector3D kTwoVel = this.acceleration.copy().mulVec(this.location.copy().add(kOneLoc).copy().mul(timeSlice/2));
+    	
+    	Vector3D kThreeLoc = this.velocity.copy().mulVec(kTwoVel.copy().mul(timeSlice/2));
+    	Vector3D kThreeVel = (this.acceleration.copy()).mulVec((this.location.copy()).add(kTwoLoc.copy().mul(timeSlice / 2)));
+    	
+    	Vector3D kFourLoc = this.velocity.copy().mulVec(kThreeVel.copy().mul(timeSlice));
+    	Vector3D kFourVel = (this.acceleration.copy()).mulVec((this.location.copy()).add(kThreeLoc.copy().mul(timeSlice)));
+    	
+    	Vector3D kAllVel = kOneVel.add((kTwoVel.mul(2)).add((kThreeVel).mul(2)).add(kFourVel));
+    	Vector3D kAllLoc = kOneLoc.add((kTwoLoc.mul(2)).add((kThreeLoc).mul(2)).add(kFourLoc));
+    	this.velocity = this.velocity.add((kAllVel).mul((timeSlice / 6)));
+    	this.location = this.location.add((kAllLoc).mul(timeSlice / 6));
+    	System.out.println("loc: x " + location.x + " y " + location.y + " z " + location.z);
+    	System.out.println("vel: x " + velocity.x + " y " + velocity.y + " z " + velocity.z);
+    }
+    
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();

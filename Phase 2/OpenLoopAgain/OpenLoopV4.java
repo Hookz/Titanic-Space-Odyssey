@@ -17,7 +17,7 @@ public class OpenLoopV4 {
 	private double timePassed = 0; //in seconds
 	private final double g; //in m/s
 	private boolean titan; //boolean, can be used for the state of the wind
-	private ArrayList<Vector2D> locations = new ArrayList<>(); //stores the different locations
+	private ArrayList<Vector2D> estimatedLocations = new ArrayList<>(); //stores the different locations
 	
 	//a max thrust from the main thrusters and a maximum thrust from the side thruster
 	public static double uMax;
@@ -231,6 +231,15 @@ public class OpenLoopV4 {
 		
 		//calculate the current values
 		thetaTemp = thetaTemp + thetaVelTemp * timeToCorrectThetaFirst + 0.5 * timeToCorrectThetaFirst * timeToCorrectThetaFirst * vToCorrectThetaFirst;
+			
+		double t = 0;
+		while (t < timeToCorrectThetaFirst) {
+			double yNow = yTemp + 0.5 * -g * t * t + yVelTemp * t;
+			estimatedLocations.add(new Vector2D(xTemp, yNow));
+			t = t + 0.1;
+			
+		}
+		
 		yTemp = yTemp + 0.5 * -g * timeToCorrectThetaFirst * timeToCorrectThetaFirst;
 		yVelTemp = yVelTemp + -g * timeToCorrectThetaFirst;
 		
@@ -254,6 +263,15 @@ public class OpenLoopV4 {
 		//calculate current values
 		thetaTemp = thetaTemp + 0.5 * vToCorrectThetaFirstVelocity * timeToCorrectThetaFirstVelocity *timeToCorrectThetaFirstVelocity + thetaVelTemp * timeToCorrectThetaFirstVelocity;//tempThetaNeeded;
 		thetaVelTemp = thetaVelTemp + timeToCorrectThetaFirstVelocity * vToCorrectThetaFirstVelocity;
+		
+		t = 0;
+		while (t < timeToCorrectThetaFirstVelocity) {
+			double yNow = yTemp + 0.5 * -g * t * t + yVelTemp * t;
+			estimatedLocations.add(new Vector2D(xTemp, yNow));
+			t = t + 0.1;
+			
+		}
+		
 		yTemp = yTemp + 0.5 * -g * timeToCorrectThetaFirstVelocity * timeToCorrectThetaFirstVelocity;
 		yVelTemp = yVelTemp + -g * timeToCorrectThetaFirstVelocity;
 		
@@ -287,14 +305,22 @@ public class OpenLoopV4 {
 		uToSpeedUpX = uTemp;
 		xVelTemp = xVelTemp + (timeToSpeedUpX * uToSpeedUpX * Math.sin(thetaTemp));
 		
+		double t = 0;
+		while (t < timeToSpeedUpX) {
+			double yNow = yTemp + 0.5 * (uToSpeedUpX * Math.cos(thetaTemp)-g) * t * t + yVelTemp * t;
+			double xNow = xTemp + 0.5 * t * t * uToSpeedUpX  * Math.sin(thetaTemp);
+			estimatedLocations.add(new Vector2D(xNow, yNow));
+			t = t + 0.1;
+		}
+		
+		double tempS = 0.5 * timeToSpeedUpX * timeToSpeedUpX * uToSpeedUpX  * Math.sin(thetaTemp);
+		xTemp = (xTemp + tempS);
+		
 		//calculate current values
 		double yAcc = (uToSpeedUpX * Math.cos(thetaTemp)) - g;
 		double yVelAverage = yVelTemp + 0.5 * (yAcc * timeToSpeedUpX);
 		yTemp = yTemp + timeToSpeedUpX * yVelAverage;
 		yVelTemp = yVelTemp + yAcc * timeToSpeedUpX;
-		
-		double tempS = 0.5 * timeToSpeedUpX * timeToSpeedUpX * uToSpeedUpX  * Math.sin(thetaTemp);
-		xTemp = (xTemp + tempS);
 		
 		//print our requirements
 		System.out.println("time to speed up x is " + timeToSpeedUpX);
@@ -349,6 +375,14 @@ public class OpenLoopV4 {
 		timeToCorrectThetaAgainVelocity = (thetaNeeded) / (0.5 * thetaVelTemp); //assuming constant acceleration (so thrust)
 		vToCorrectThetaAgainVelocity = -(thetaVelTemp / timeToCorrectThetaAgainVelocity);
 		
+		double t = 0;
+		while (t < (timeToCorrectThetaAgain + timeToCorrectThetaAgainVelocity)) {
+			double yNow = yTemp + 0.5 * (-g) * t * t + yVelTemp * t;
+			double xNow = xTemp + xVelTemp * t;
+			estimatedLocations.add(new Vector2D(xNow, yNow));
+			t = t + 0.1;
+		}
+		
 		yTemp = yTemp + yVelTemp * timeToCorrectThetaAgain + 0.5 *timeToCorrectThetaAgain * timeToCorrectThetaAgain * (-g);
 		yVelTemp = yVelTemp + timeToCorrectThetaAgain * -g; //as there is no thrust applied
 		System.out.println("y after first half of theta corr " + yTemp);
@@ -388,6 +422,14 @@ public class OpenLoopV4 {
 		//calculate which u is needed to slow down
 		double accNeeded = xVelTemp / timeToSlowDownX;
 		uToSlowDownX = Math.abs(accNeeded / Math.sin(thetaTemp));
+		
+		double t = 0;
+		while (t < timeToSlowDownX) {
+			double yNow = yTemp + 0.5 * (uToSlowDownX * Math.cos(thetaTemp)-g) * t * t + yVelTemp * t;
+			double xNow = xTemp + 0.5 * t * t * uToSlowDownX  * Math.sin(thetaTemp) + t * xVelTemp * t;
+			estimatedLocations.add(new Vector2D(xNow, yNow));
+			t = t + 0.1;
+		}
 		
 		//calculate new values
 		xTemp = xTemp + xVelTemp * timeToSlowDownX + 0.5 * timeToSlowDownX * timeToSlowDownX * uToSlowDownX *Math.sin(thetaTemp);
@@ -456,6 +498,14 @@ public class OpenLoopV4 {
 		System.out.println("time to correct angular vel final " + timeToCorrectThetaFirstVelocity);
 		System.out.println("thrust needed to correct angular vel final " + vToCorrectThetaFirstVelocity);
 		
+		double t = 0;
+		while (t < (timeToCorrectThetaFinal + timeToCorrectThetaFinalVelocity)) {
+			double yNow = yTemp + 0.5 * (-g) * t * t + yVelTemp * t;
+			double xNow = xTemp;
+			estimatedLocations.add(new Vector2D(xNow, yNow));
+			t = t + 0.1;
+		}
+		
 		//calculate new values according to the last correction
 		yTemp = yTemp + timeToCorrectThetaFinalVelocity * yVelTemp + 0.5 * timeToCorrectThetaFinalVelocity * timeToCorrectThetaFinalVelocity * -g;
 		yVelTemp = yVelTemp + -g * timeToCorrectThetaFinalVelocity;
@@ -481,6 +531,15 @@ public class OpenLoopV4 {
 			sNow = 0.5 * -g * timeToLetYFall * timeToLetYFall + yVelTemp * timeToLetYFall;
 			timeToLetYFall = timeToLetYFall + 0.0001;
 		}
+		
+		double t = 0;
+		while (t < timeToLetYFall) {
+			double yNow = yTemp + 0.5 * (-g) * t * t + yVelTemp * t;
+			double xNow = xTemp;
+			estimatedLocations.add(new Vector2D(xNow, yNow));
+			t = t + 0.1;
+		}
+		
 		//final theta is 0.0, final x is 0.0
 		yTemp = yTemp + sNow; //timeToLetYFall * 0.5 * timeToLetYFall * g - yVelTemp * timeToLetYFall;
 		yVelTemp = yVelTemp - g * timeToLetYFall; 
@@ -489,9 +548,19 @@ public class OpenLoopV4 {
 		System.out.println("yTemp left after freefall " + yTemp);
 		System.out.println("yVelTemp after freefall " + yVelTemp);
 		
+		
 		//calculate in which time an with which u, the y vel can be slowed down (with constant thrust)
 		timeToCorrectYVelocityBeforeLanding = Math.abs((yTemp) / (0.5 * yVelTemp));
 		uToCorrectYVelocityBeforeLanding = Math.abs((((yVelTemp)/ timeToCorrectYVelocityBeforeLanding))) + g;
+		
+		t = 0;
+		while (t < (timeToCorrectYVelocityBeforeLanding + 0.1)) {
+			double yNow = yTemp + 0.5 * (uToCorrectYVelocityBeforeLanding - g) * t * t + yVelTemp * t;
+			double xNow = xTemp;
+			estimatedLocations.add(new Vector2D(xNow, yNow));
+			t = t + 0.1;
+		}
+		
 		yTemp = yTemp + yVelTemp * timeToCorrectYVelocityBeforeLanding + timeToCorrectYVelocityBeforeLanding * 0.5 * timeToCorrectYVelocityBeforeLanding * (uToCorrectYVelocityBeforeLanding - g);
 		yVelTemp = yVelTemp + timeToCorrectYVelocityBeforeLanding * (uToCorrectYVelocityBeforeLanding-g);
 	
@@ -501,6 +570,10 @@ public class OpenLoopV4 {
 		System.out.println("final y is " + yTemp);
 		System.out.println();
 		System.out.println();
+	}
+	
+	public ArrayList<Vector2D> getLocations(){
+		return estimatedLocations;
 	}
 	
 }
