@@ -1,4 +1,11 @@
-package Mission;
+// never used
+
+
+/*package Mission; 
+
+import ControlSystem.Vector2D;
+import ControlSystem.Vector3D;
+import ControlSystem.Wind;
 
 //the only spaceship class we'll need
 
@@ -15,6 +22,7 @@ public class UltimateSpaceShip extends Wind{
 	public double mass; //kg
 	private double height; //m
     private double width; //m
+    private boolean titan;
     
     protected Vector3D velocity;
     protected Vector3D acceleration;
@@ -59,7 +67,9 @@ public class UltimateSpaceShip extends Wind{
 	
 	private boolean tries = true; //an arbitrary boolean for now
 	
-	public UltimateSpaceShip() {
+	public UltimateSpaceShip(boolean titan) {
+		super(titan);
+		this.titan =titan;
 		if (this.coordinates == null) {
 			this.coordinates = new Vector3D();
 		}
@@ -74,7 +84,9 @@ public class UltimateSpaceShip extends Wind{
 		}
 	}
 
-	public UltimateSpaceShip(double mass, Vector3D coor, Vector3D vel, double height, double width, double timeSlice) {
+	public UltimateSpaceShip(double mass, Vector3D coor, Vector3D vel, double height, double width, double timeSlice, boolean titan) {
+		super(titan);
+		this.titan = titan;
 		this.mass = mass;
 		this.coordinates = coor;
 		this.velocity = vel;
@@ -439,4 +451,4 @@ public class UltimateSpaceShip extends Wind{
 		return copy;
 
 	}
-}
+}*/

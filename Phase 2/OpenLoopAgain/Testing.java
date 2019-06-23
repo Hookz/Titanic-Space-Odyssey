@@ -1,5 +1,8 @@
 package OpenLoopAgain;
 
+import ControlSystem.Vector2D;
+import Land.SpaceShip;
+
 //this class is done - just for the test
 
 public class Testing {
@@ -20,7 +23,7 @@ public class Testing {
 		OpenLoopV4 landingTitan = new OpenLoopV4(spaceShip, g);		
 		
 		/*
-		while (timePassed < landingTitan.timeToSlowDownX) {
+		while (timePassed < landingTitan.timeToCorrectThetaFinalVelocity) {
 				landingTitan.update(timeSlice);
 				
 				System.out.println("location x is " + spaceShip.getLocation().x);

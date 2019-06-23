@@ -1,5 +1,7 @@
 package OpenLoopAgain;
 
+import Land.SpaceShip;
+
 public class ODESolvers {
 	public static SpaceShip spaceShip;
 	

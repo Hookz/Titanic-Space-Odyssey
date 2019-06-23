@@ -20,6 +20,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -61,6 +62,8 @@ public class Main extends Application {
     private Button playBackButton;
     private boolean change = false;
     private RocketModel r;
+    private Label launchLabel;
+    private Label launchLabel2;
 
     @Override
     public void start(Stage stage) {
@@ -112,11 +115,13 @@ public class Main extends Application {
             r.calculateVelocityFromThrust(r.earthToTitan, TIME_SLICE);
             gc.setFill(Color.BLACK);
             gc.fillOval(r.location.x - 3, r.location.y - 3, 3*2, 3* 2);
+            gc.fillText("Titanic", r.location.x + 10, r.location.y + 10);
         }else if(bodySystem.getSeconds()>Trajectory.launchToEarth && Trajectory.landOnEarth<bodySystem.getSeconds()){
             r.location = bodySystem.getBodies().get(10).getLocation();
             r.calculateVelocityFromThrust(r.titanToEarth, TIME_SLICE);
             gc.setFill(Color.BLACK);
             gc.fillOval(r.location.x - 3, r.location.y - 3, 3*2, 3* 2);
+            gc.fillText("Earthanic", r.location.x + 10, r.location.y + 10);
 
         }
 
@@ -136,9 +141,6 @@ public class Main extends Application {
 
             gc.setFill(Color.BLACK);
             gc.fillOval(otherX - BODY_RADIUS, otherY - BODY_RADIUS, BODY_RADIUS * 2, BODY_RADIUS * 2);
-
-            // draw elliptical path
-
 
             // draw label
             Text text = new Text(body.name);
@@ -167,6 +169,7 @@ public class Main extends Application {
         createTimeLabel();
         createFPSLabel();
         createScaleLabel();
+        createLaunchLabels();
         HBox hbox = createHBox();
         border.setBottom(hbox);
         HBox top = createHBoxTwo();
@@ -235,7 +238,15 @@ public class Main extends Application {
         hbox.setSpacing(10);   // Gap between nodes
         hbox.setStyle("-fx-background-color: #336699;");
         hbox.setFillHeight(true);
-        hbox.getChildren().add(this.timeLabel);
+        VBox newBox = new VBox();
+        newBox.setPadding(new Insets(0,0, 0, 0));
+        newBox.setSpacing(1);
+        newBox.setStyle("- fx-background-color: #336699");
+        newBox.setFillWidth(true);
+        newBox.getChildren().add(this.timeLabel);
+        newBox.getChildren().add(this.launchLabel);
+        
+        hbox.getChildren().add(newBox);
         hbox.getChildren().add(this.fpsLabel);
         hbox.getChildren().add(this.scaleLabel);
         hbox.getChildren().add(buttons);
@@ -343,6 +354,20 @@ public class Main extends Application {
         scaleLabel.setPrefSize(300, 20);
         scaleLabel.setFont(new Font("Serif", 16));
         scaleLabel.setTextFill(Color.WHITE);
+    }
+    
+    private void createLaunchLabels() {
+    	launchLabel = new Label();
+    	launchLabel.setPrefSize(300, 200);
+    	launchLabel.setFont(new Font("Serif", 16));
+    	launchLabel.setTextFill(Color.WHITE);
+    	launchLabel.setText("The launch to titan is at: " + Trajectory.launchToTitan + " seconds.");
+    	
+    	launchLabel2 = new Label();
+    	launchLabel2.setPrefSize(300, 200);
+    	launchLabel2.setFont(new Font("Serif", 16));
+    	launchLabel2.setTextFill(Color.WHITE);
+    	launchLabel2.setText("The launch to earth is at: " + Trajectory.launchToEarth + " seconds.");
     }
 
     public static void main(String[] args) {

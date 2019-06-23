@@ -11,8 +11,11 @@ public class SpaceShip extends Wind {
     private double gravity;//acceleration of gravity
     public static final double MASS_TITAN = 1.3452E+23; //kg
     public static final double GRAV_TITAN = 1.352; //acceleration due to gravity on titan, in ms^2
+    public static final double GRAV_EARTH = 9.81;
+    public static final double MASS_EARTH = 5.972E+24;
     public static final double G = 6.67E-11;
-    private static final double DENSITY = 1.23995416; // density of Titan's atmosphere, kg/m^3
+    private static final double DENSITY_TITAN = 1.23995416; // density of Titan's atmosphere, kg/m^3
+    private static final double DENSITY_EARTH = 1.2041;
     private static final double MAX_ACCELERATION = 9.6; // m/s^2
     private double tilt = 0; //radians
     private double angularVelocity; // rad/s
@@ -30,10 +33,12 @@ public class SpaceShip extends Wind {
     public static double TIME_SLICE= 0.1;
     private double height; //m
     private double width; //m
+    private boolean titan;
     //TODO add ytolerance
 
 
-    public SpaceShip(){
+    public SpaceShip(boolean titan){
+    	super(titan);
         this.mass = 0;
         this.coordinates = new Vector3D(0,0,0);
         if (acceleration == null) {
@@ -48,8 +53,8 @@ public class SpaceShip extends Wind {
         this.height = 0;
         this.width = 0;
     }
-    public SpaceShip(double mass, double xLocation, double yLocation, double zLocation, double height, double width) {
-        super();
+    public SpaceShip(double mass, double xLocation, double yLocation, double zLocation, double height, double width, boolean titan) {
+        super(titan);
         this.mass = mass;
         this.coordinates = new Vector3D(xLocation,yLocation,zLocation);
         this.height = height;
@@ -212,8 +217,15 @@ public class SpaceShip extends Wind {
 
     public void addAirResistance() {
         //without using tilt or anything
-        double resisX = 0.5 * DRAG_CO * DENSITY * (this.height * this.width) * this.velocity.getX();
-        double resisY = 0.5 * DRAG_CO * DENSITY * (this.width * this.width) * this.velocity.getY();
+    	double resisX, resisY;
+    	if (titan) {
+    		resisX = 0.5 * DRAG_CO * DENSITY_TITAN * (this.height * this.width) * this.velocity.getX();
+    		resisY = 0.5 * DRAG_CO * DENSITY_TITAN * (this.width * this.width) * this.velocity.getY();
+    	}
+    	else {
+    		resisX = 0.5 * DRAG_CO * DENSITY_EARTH * (this.height * this.width) * this.velocity.getX();
+    		resisY = 0.5 * DRAG_CO * DENSITY_EARTH * (this.width * this.width) * this.velocity.getY();
+    	}
         Vector2D resistance = new Vector2D(-resisX, -resisY);
         addAccelerationByForce(resistance);
 
@@ -228,7 +240,13 @@ public class SpaceShip extends Wind {
 
     public void calculateForce(){
         calculateRelativeWindSpeed();
-        this.force = (area/2)*airDensity*(relativeWindSpeed*relativeWindSpeed);
+        if (titan) {
+        	this.force = (area/2)*DENSITY_TITAN*(relativeWindSpeed*relativeWindSpeed);
+        }
+        else {
+        	this.force = (area/2)*DENSITY_EARTH*(relativeWindSpeed*relativeWindSpeed);
+        }
+        
         if (this.getRelativeWindSpeed()<0)
             this.force = -this.force;
 

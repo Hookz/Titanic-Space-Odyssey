@@ -6,7 +6,7 @@ public class ClosedLoop {
         Vector3D initialVelocity = new Vector3D(0,0,0);
 //        Vector3D velocity = new Vector3D(0,0,0);
         Vector2D thruster = new Vector2D(0,0); //x is u, y is v
-        Wind wind = new Wind();
+        Wind wind = new Wind(true);
         final double TIME_STEP = 0.1;
         double timePassed = 0;
 
@@ -103,7 +103,7 @@ public class ClosedLoop {
 
     public static final double g = 1.352;
 
-    public static SpaceShip spaceShip = new SpaceShip(5000,500,500,0,17,4.5);
+    public static SpaceShip spaceShip = new SpaceShip(5000,500,500,0,17,4.5, true);
 
     /**
      *

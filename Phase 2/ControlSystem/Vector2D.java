@@ -1,7 +1,8 @@
 package ControlSystem;
 
 public class Vector2D {
-    protected double x,y;
+    public double x;
+	public double y;
 
     public Vector2D() { }
 

@@ -1,19 +1,29 @@
 package OpenLoopAgain;
-
+import Land.SpaceShip;
+import Land.Wind;
+import ControlSystem.Vector2D;
 import java.util.ArrayList;
+
+/*Quick explanation about this class
+ * 
+ * calculates the thrust (from both the main thruster and the side thrusters) beforehand
+ * does NOT take wind into account - when wind is used, the x location and x velocity will almost always be incorrect
+ * as the update method, when used, produces different output, an arraylist with locations is provided
+ * */
 
 public class OpenLoopV4 {
 	private SpaceShip spaceship;
-	//private double freefall;
+	
 	private double timePassed = 0; //in seconds
-	private final double g;
-	private boolean titan;
+	private final double g; //in m/s
+	private boolean titan; //boolean, can be used for the state of the wind
+	private ArrayList<Vector2D> locations = new ArrayList<>(); //stores the different locations
 	
+	//a max thrust from the main thrusters and a maximum thrust from the side thruster
 	public static double uMax;
-	public static final double V_MAX = 0.2 * Math.PI; //m/s^2
+	public static final double V_MAX = 0.25 * Math.PI; //m/s^2
 	
-	//use these to calculate the times needed - so this can be used in the model
-	//so the output is determined before - with times and which u and v to use at what time
+	//to keep track of where the lunar lander is at this moment
 	private double xTemp;
 	private double yTemp;
 	private double thetaTemp;
@@ -22,36 +32,35 @@ public class OpenLoopV4 {
 	private double yVelTemp = 0;
 	private double thetaVelTemp = 0;
 	
-	private double xAccTemp = 0;
-	private double yAccTemp = 0;
+	//the y from which you start - the s your lunar lander needs to make
+	private double yGoal;
 	
-	private ArrayList<Double> wind;
-	
-	//everything we need to calculate for the different times at which stuff happens, then this can be used for the simulation
-	private double timeToCorrectThetaFirst; //done
-	public double timeToCorrectThetaFirstVelocity; //done --make private later
-	public double timeToSpeedUpX;
-	private double timeToCorrectThetaAgain;
-	private double timeToCorrectThetaAgainVelocity; 
+	//to store the calculations done in the doCalculations() method
+	public double timeToCorrectThetaFirst; 
+	public double timeToCorrectThetaFirstVelocity;
+	public double timeToSpeedUpX; 
+	public double timeToCorrectThetaAgain; 
+	public double timeToCorrectThetaAgainVelocity; 
 	public double timeToSlowDownX;
-	private double timeToCorrectThetaFinal;
-	private double timeToCorrectThetaFinalVelocity;
-	private double timeToStartCorrectingY;
-	private double timeToCorrectYVelocityBeforeLanding;
-	public double finalTime;
+	public double timeToCorrectThetaFinal;
+	public double timeToCorrectThetaFinalVelocity;
+	public double timeToLetYFall;
+	public double timeToCorrectYVelocityBeforeLanding;
+	public double finalTime; 
 	
-	private double vToCorrectThetaFirst; //done
-	private double vToCorrectThetaFirstVelocity; //done
-	private double vToCorrectThetaAgain;
-	private double vToCorrectThetaAgainVelocity;
+	private double vToCorrectThetaFirst; 
+	private double vToCorrectThetaFirstVelocity; 
+	private double vToCorrectThetaAgain; 
+	private double vToCorrectThetaAgainVelocity; 
 	private double vToCorrectThetaFinal;
 	private double vToCorrectThetaFinalVelocity;
 	
-	private double uToSpeedUpX;
+	private double uToSpeedUpX; 
 	private double uToSlowDownX;
 	private double uToCorrectYVelocityBeforeLanding;
 	
 	//the initial position is the location of the spaceship
+	//call the calculation method in the constructor already
 	public OpenLoopV4(SpaceShip spaceship, double g) {
 		this.spaceship = spaceship;
 		this.g = g;
@@ -63,55 +72,66 @@ public class OpenLoopV4 {
 		}
 		uMax = 30000 / spaceship.getMass(); //30 kN max thrust, then get the maximum acceleration - which we need - m/s^2
 		System.out.println("uMax is " + uMax + " m/s");
+		
+		//set temporary coordinates
 		xTemp = spaceship.getLocation().x;
 		yTemp = spaceship.getLocation().y;
+		yGoal = spaceship.getLocation().y;
 		thetaTemp = spaceship.getTilt();
 		
 		System.out.println("x loc is " + xTemp + ", y loc is " + yTemp + ", theta is " + thetaTemp);
 		
+		
 		doCalculations();
+		System.out.println();
+		System.out.println();
 	}
 	
+	//will update the spaceship object itself - uses the thrust needed to find accelerations
+	//unfortunately, when the passed time gets bigger, so do the differences between the previously calculated values and the calculated values
 	public void update(double timeSlice) {
-		spaceship.setAccelerationByMainThrusters(u());
-		spaceship.setTorque(v());	
+		if (spaceship.getLocation().y > 0) {
+			double uNeeded = u();
+			double vNeeded = v();
 		
-		spaceship.addAccelerationByMainThrusters();
-		spaceship.addAccelerationBySideThrusters(timeSlice);
+			spaceship.setAccelerationByMainThrusters(uNeeded);
+			spaceship.setTorque(vNeeded);	
+			spaceship.addAccelerationBySideThrusters(timeSlice);
 		
-		spaceship.recalculateLocation(timeSlice);
+			spaceship.recalculateLocation(timeSlice);
 		
-		//if testing: add wind eventually
-		
-		spaceship.addPassedTime(timeSlice);
-		timePassed =  (timePassed +  timeSlice);
-		
-		//System.out.println("passed time " + this.timePassed);
-		
+			spaceship.addPassedTime(timeSlice);
+			this.timePassed = timePassed + timeSlice;
+		}
 		if(spaceship.getLocation().y <= 0) {
 			spaceship.successfuLanding();
 		}
 	}
 	
+	//getter
 	public double getTimePassed() {
 		return timePassed;
 	}
 	
+	//call the other methods that do the calculations in the right order
 	public void doCalculations() {
 		correctThetaFirst();
 		correctXSpeedUp();
+		correctThetaForSlowingDown();
 		correctXSlowDown();
-		//correctThetaAgain();
-		//correctYVelocity();
+		correctThetaAgain();
+		correctYVelocity();
 		adjustTime();
 		//add the calculations for every variable inhere
 		
+		//when needed, this can be used
 		Wind wind = new Wind(titan);
-		this.wind = wind.calculateForcesForWholeTraject(spaceship, spaceship.getYLocation());
+		ArrayList<Double> windspeeds = wind.calculateForcesForWholeTraject(spaceship, spaceship.getYLocation());
 	}
 	
-	
-	public void adjustTime() {
+	//such that, as the update methods runs through a while loop, the timestamps will be okay
+	public void adjustTime() { 
+		timeToCorrectThetaFirst = this.timeToCorrectThetaFirst;
 		timeToCorrectThetaFirstVelocity = this.timeToCorrectThetaFirstVelocity + this.timeToCorrectThetaFirst;
 		timeToSpeedUpX = this.timeToCorrectThetaFirstVelocity + this.timeToSpeedUpX;
 		timeToCorrectThetaAgain = this.timeToCorrectThetaAgain + this.timeToSpeedUpX;
@@ -119,299 +139,368 @@ public class OpenLoopV4 {
 		timeToSlowDownX = this.timeToCorrectThetaAgainVelocity + this.timeToSlowDownX;
 		timeToCorrectThetaFinal = this.timeToCorrectThetaFinal + this.timeToSlowDownX;
 		timeToCorrectThetaFinalVelocity = this.timeToCorrectThetaFinalVelocity + timeToCorrectThetaFinal;
-		timeToCorrectYVelocityBeforeLanding = this.timeToCorrectYVelocityBeforeLanding + this.timeToCorrectThetaAgainVelocity;
+		timeToLetYFall = this.timeToCorrectThetaFinalVelocity + this.timeToLetYFall;
+		timeToCorrectYVelocityBeforeLanding = this.timeToLetYFall + this.timeToCorrectYVelocityBeforeLanding;
 		System.out.println("final time should be " + timeToCorrectYVelocityBeforeLanding);
 		finalTime = timeToCorrectYVelocityBeforeLanding;
 	}
 	
-	
+	//determines which u to use at which time
 	public double u() {
 		double u = 0;
 		
 		if (timePassed <= timeToSpeedUpX && timePassed > timeToCorrectThetaFirstVelocity) {
 			u = uToSpeedUpX;
-			//System.out.println("speeding up x");
+			System.out.println("speeding up x");
 		}
 		else if (timePassed <= timeToSlowDownX && timePassed > timeToCorrectThetaAgainVelocity) {
 			u = uToSlowDownX; 
-			//System.out.println("slowing down x");
+			System.out.println("slowing down x");
 		}
-		else if(timePassed <= timeToCorrectYVelocityBeforeLanding && timePassed> timeToCorrectThetaFinalVelocity) {
+		//if the time is smaller than timeToLetYFall, and bigger than timeToCorrectThetaFinalVelocity, no thrust is applied
+		else if(timePassed <= timeToCorrectYVelocityBeforeLanding && timePassed> timeToLetYFall) {
 			u = uToCorrectYVelocityBeforeLanding;
-			//System.out.println("slowing down y");
+			System.out.println("slowing down y");
 		}
 		return u;
 	}
 	
+	//determines which v to use at which time
 	public double v() {
 		double v = 0;
 		if (timePassed <= timeToCorrectThetaFirst) {
 			v = vToCorrectThetaFirst;
-			//System.out.println("correcting theta first");
+			System.out.println("correcting theta first");
 		}
 		else if(timePassed >timeToCorrectThetaFirst && timePassed <= timeToCorrectThetaFirstVelocity) {
 			v = vToCorrectThetaFirstVelocity;
-			//System.out.println("correcting theta vel after that");
+			System.out.println("correcting theta vel after that");
 		}
 		else if (timePassed> timeToSpeedUpX && timePassed <= timeToCorrectThetaAgain) {
 			v = vToCorrectThetaAgain;
-			//System.out.println("correcting theta again");
+			System.out.println("correcting theta again");
 		}
 		else if (timePassed > timeToCorrectThetaAgain && timePassed <= timeToCorrectThetaAgainVelocity) {
 			v = vToCorrectThetaAgainVelocity;
-			//System.out.println("correcting theta vel again");
+			System.out.println("correcting theta vel again");
 		}
-		else if(timePassed > timeToCorrectThetaAgainVelocity && timePassed <= timeToSlowDownX) {
+		else if(timePassed > timeToSlowDownX && timePassed <= timeToCorrectThetaFinal) {
 			v = vToCorrectThetaFinal;
-			//System.out.println("correcting theta final");
+			System.out.println("correcting theta final");
 		}
 		else if(timePassed > timeToCorrectThetaFinal && timePassed <= timeToCorrectThetaFinalVelocity) {
 			v = vToCorrectThetaFinalVelocity;
-			//System.out.println("correcting theta vel final");
+			System.out.println("correcting theta vel final");
 		}
 		return v;
 	}
 	
-	public void correctThetaFirst() { //completely finished - I think it's error proof too - yesss did some experiments and it shoulddd work
-		//first get it to half the theta needed
+	//will correct theta so y acc will be zero / close to zero, and x can be corrected
+	//uses maximum side thrust
+	public void correctThetaFirst() { 
 		
-		double tempThetaNeeded = Math.acos(g / uMax); //yes
+		//calculate the theta needed such that y acc will be minimised
+		double tempThetaNeeded = Math.acos(g / uMax); 
 	
-		double timeNeeded = 0.001;
+		double timeNeeded = 0.0001;
 		double temporaryV = 1000;
 		double tempMax;
-		double tempMaxVel = 0;
+		double tempNeededVel = 0;
 		
-		if (Math.abs(xTemp) > 0) {
+		//calculate how long it takes to reach half of the desired theta with maximum thrust
+		if (xTemp > 0) {
 			tempThetaNeeded = -tempThetaNeeded;
 			temporaryV = -temporaryV;
 			tempMax = -V_MAX;
 			
-			//there's no starting rotation velocity, so leave this out
 			while (temporaryV < tempMax) {
-				tempMaxVel = ((tempThetaNeeded - thetaTemp) / timeNeeded);
-				temporaryV = tempMaxVel / timeNeeded;
-				//temporaryV =  (((0.5 * (tempThetaNeeded - thetaTemp))/timeNeeded)/timeNeeded);
-				timeNeeded = timeNeeded + 0.00001;
-				//System.out.println(temporaryV);
+				tempNeededVel = ((tempThetaNeeded - thetaTemp) / timeNeeded) - thetaVelTemp;
+				temporaryV = tempNeededVel / timeNeeded;
+				timeNeeded = timeNeeded + 0.000001;
 			}
 		}
 		else {
 			while (temporaryV > V_MAX) {
-				tempMaxVel = (tempThetaNeeded - thetaTemp) / timeNeeded;
-				temporaryV = tempMaxVel / timeNeeded;
-				
-				//temporaryV =  (((0.5 * (tempThetaNeeded - thetaTemp)))/timeNeeded)/timeNeeded;
-				timeNeeded = timeNeeded + 0.00001;
-				//System.out.println(temporaryV);
+				tempNeededVel = ((tempThetaNeeded - thetaTemp) / timeNeeded) - thetaVelTemp;
+				temporaryV = tempNeededVel / timeNeeded;
+				timeNeeded = timeNeeded + 0.000001;
 			}
 		}
-		System.out.println("desired angle is " + tempThetaNeeded);
-		//checked, should work correctly
-		
 		timeToCorrectThetaFirst = timeNeeded;
 		vToCorrectThetaFirst = temporaryV;
-		System.out.println("time to correct theta first is " + timeToCorrectThetaFirst);
-		System.out.println("v needed to correct theta is " + vToCorrectThetaFirst);
 		
+		//calculate the current values
 		thetaTemp = thetaTemp + thetaVelTemp * timeToCorrectThetaFirst + 0.5 * timeToCorrectThetaFirst * timeToCorrectThetaFirst * vToCorrectThetaFirst;
-		System.out.println("thetaNow is " + thetaTemp);
+		yTemp = yTemp + 0.5 * -g * timeToCorrectThetaFirst * timeToCorrectThetaFirst;
+		yVelTemp = yVelTemp + -g * timeToCorrectThetaFirst;
 		
 		//now slow down the velocity so the theta is constant
 		thetaVelTemp = (thetaVelTemp + vToCorrectThetaFirst * timeToCorrectThetaFirst);
-		System.out.println("angularvel is " + thetaVelTemp);
 		
-		timeToCorrectThetaFirstVelocity = (tempThetaNeeded - thetaTemp) / (0.5 * thetaVelTemp); //assuming constant acceleration (so thrust)
-		vToCorrectThetaFirstVelocity = -(thetaVelTemp / timeToCorrectThetaFirstVelocity); //needs to be facing the other way
+		//assuming constant acceleration / thrust
+		timeToCorrectThetaFirstVelocity = Math.abs((tempThetaNeeded - thetaTemp) / (0.5 * thetaVelTemp)); 
+		vToCorrectThetaFirstVelocity = -(thetaVelTemp / timeToCorrectThetaFirstVelocity); 
+		
+		System.out.println("desired angle is " + tempThetaNeeded);
+		System.out.println("time to correct theta first is " + timeToCorrectThetaFirst);
+		System.out.println("v needed to correct theta is " + vToCorrectThetaFirst);
+		System.out.println("thetaNow is " + thetaTemp);
+		System.out.println("y after first theta correction is " + yTemp);
+		System.out.println("yvel after first theta correction is " + yVelTemp);
+		System.out.println("angularvel is " + thetaVelTemp);
 		System.out.println("time to correct angular vel " + timeToCorrectThetaFirstVelocity);
 		System.out.println("thrust needed to correct angular vel " + vToCorrectThetaFirstVelocity);
 		
-		
-		thetaTemp = thetaTemp + 0.5 * vToCorrectThetaFirstVelocity * timeToCorrectThetaFirstVelocity + thetaVelTemp * timeToCorrectThetaFirstVelocity;//tempThetaNeeded;
+		//calculate current values
+		thetaTemp = thetaTemp + 0.5 * vToCorrectThetaFirstVelocity * timeToCorrectThetaFirstVelocity *timeToCorrectThetaFirstVelocity + thetaVelTemp * timeToCorrectThetaFirstVelocity;//tempThetaNeeded;
 		thetaVelTemp = thetaVelTemp + timeToCorrectThetaFirstVelocity * vToCorrectThetaFirstVelocity;
+		yTemp = yTemp + 0.5 * -g * timeToCorrectThetaFirstVelocity * timeToCorrectThetaFirstVelocity;
+		yVelTemp = yVelTemp + -g * timeToCorrectThetaFirstVelocity;
+		
 		System.out.println("theta at the end of the correction is " + thetaTemp);
 		System.out.println("theta vel after the first complete correction " + thetaVelTemp);
-		
-		
-		//this whole method has been checked and debugged
+		System.out.println("y after first theta vel correction is " + yTemp);
+		System.out.println("yvel after first theta velcorrection is " + yVelTemp);
+		System.out.println();
+		System.out.println();
 	}
 	
-	public void correctXSpeedUp() { //look into this later - IT SHOULD WORK BUT IT DOESNT
-		double sNeeded = xTemp * 1/3;
+	//speeds up until x has reaches 1/4th of the distance to point 0
+	public void correctXSpeedUp() {
+		double sNeeded = xTemp * 1/4;
 		System.out.println("needed s to travel is " + sNeeded);
 		
 		double time = 0.0001;
 		double uTemp = uMax + 10;
 		double aNeeded = 0;
+		double maxVel = 0;
 		
+		//calculate the time needed to get to sNeeded with max thrust
 		while (uTemp > uMax) {
-			aNeeded =(2* sNeeded)/ (time*time);
-			uTemp = aNeeded / Math.abs(Math.sin(thetaTemp));
-			//velMax = (3.081 * sNeeded) / (time/* * Math.abs(Math.sin(thetaTemp))*/);
-			//uTemp = (velMax / Math.abs((time * Math.sin(thetaTemp))));
-			//uTemp = ((((xNeeded - xTemp))/time - xVelTemp)/time)/ Math.sin(thetaTemp);
-			//System.out.println(uTemp);
-			time = time + 0.00001;
+			maxVel = 2 * (sNeeded / time); //average vel is sNeeded / time, max is two times the other one in case of constant acc
+			aNeeded =(maxVel)/ (time);
+			uTemp = Math.abs(aNeeded / (Math.sin(thetaTemp)));
+			time = time + 0.000001;
 		} 
+		
 		timeToSpeedUpX = time;
-		System.out.println("time to speed up x is " + timeToSpeedUpX);
 		uToSpeedUpX = uTemp;
-		double yAcc = uToSpeedUpX * Math.cos(thetaTemp) - g;
-		System.out.println("y acc is " + yAcc);
+		xVelTemp = xVelTemp + (timeToSpeedUpX * uToSpeedUpX * Math.sin(thetaTemp));
+		
+		//calculate current values
+		double yAcc = (uToSpeedUpX * Math.cos(thetaTemp)) - g;
+		double yVelAverage = yVelTemp + 0.5 * (yAcc * timeToSpeedUpX);
+		yTemp = yTemp + timeToSpeedUpX * yVelAverage;
+		yVelTemp = yVelTemp + yAcc * timeToSpeedUpX;
+		
 		double tempS = 0.5 * timeToSpeedUpX * timeToSpeedUpX * uToSpeedUpX  * Math.sin(thetaTemp);
+		xTemp = (xTemp + tempS);
+		
+		//print our requirements
+		System.out.println("time to speed up x is " + timeToSpeedUpX);
 		System.out.println("the s reached is " + tempS);
 		System.out.println("u needed to speed up x is " + uToSpeedUpX);
-		
+		System.out.println("xTemp is " + xTemp);
+		System.out.println("y after first x corr is " + yTemp);
+		System.out.println("yveltemp after first x corr is " + yVelTemp);
+		System.out.println();
+		System.out.println();
 	}
 	
-	
-	public void correctXSlowDown() {
+	//corrects the theta so it's the exact opposite as the one in the speeding up the x
+	public void correctThetaForSlowingDown() { 
+		//turn so it has the same angle, but faces the other way
 		
-		//turn one half again - so it has the same angle, but faces the other way
 		double thetaNeeded = -thetaTemp; //facing exactly the other way
 		System.out.println("theta needed for slowing down is " + thetaNeeded);
+		System.out.println("theta from which we start " + thetaTemp);
 		
-		
-		double timeNeeded = 0.001;
+		double timeNeeded = 0.0001;
 		double temporaryV = 1000;
 		double tempMax;
 		double tempMaxVel = 0;
-		
-		if (Math.abs(xTemp) < 0) {
+
+		//using maximum thrust again, get to half of the desired theta distance
+		if (thetaTemp >= 0) {
 			temporaryV = -temporaryV;
 			tempMax = -V_MAX;
 			
 			//there's no starting rotation velocity, so leave this out
 			while (temporaryV < tempMax) {
-				tempMaxVel = (((thetaNeeded - thetaTemp)-thetaVelTemp) / timeNeeded);
+				tempMaxVel = (((thetaNeeded - thetaTemp)/timeNeeded -thetaVelTemp));
 				temporaryV = tempMaxVel / timeNeeded;
-				//temporaryV =  (((0.5 * (tempThetaNeeded - thetaTemp))/timeNeeded)/timeNeeded);
-				timeNeeded = timeNeeded + 0.00001;
-				//System.out.println(temporaryV);
+				timeNeeded = timeNeeded + 0.0000001;
 			}
 		}
 		else {
 			while (temporaryV > V_MAX) {
-				tempMaxVel = ((thetaNeeded - thetaTemp)-thetaVelTemp) / timeNeeded;
+				tempMaxVel = (((thetaNeeded - thetaTemp)/timeNeeded) -thetaVelTemp);
 				temporaryV = tempMaxVel / timeNeeded;
-				
-				//temporaryV =  (((0.5 * (tempThetaNeeded - thetaTemp)))/timeNeeded)/timeNeeded;
-				timeNeeded = timeNeeded + 0.00001;
-				//System.out.println(temporaryV);
+				timeNeeded = timeNeeded + 0.0000001;
 			}
 		}
 		
 		timeToCorrectThetaAgain = timeNeeded;
-		System.out.println("time needed to correct theta for slowing down " + timeNeeded);
 		vToCorrectThetaAgain = temporaryV;
-		System.out.println("v needed to correct the theta of the lunar lander in this time " + temporaryV);
-		//then slow down the theta again
 		
-		thetaTemp = thetaTemp + timeToCorrectThetaAgain * vToCorrectThetaAgain + thetaVelTemp *timeToCorrectThetaAgain;
+		//calculate current values and the time needed to slow down
+		thetaTemp = thetaTemp + thetaVelTemp * timeToCorrectThetaAgain + 0.5 * timeToCorrectThetaAgain * timeToCorrectThetaAgain * vToCorrectThetaAgain;
+		thetaVelTemp = thetaVelTemp + (vToCorrectThetaAgain * timeToCorrectThetaAgain);		
+		timeToCorrectThetaAgainVelocity = (thetaNeeded) / (0.5 * thetaVelTemp); //assuming constant acceleration (so thrust)
+		vToCorrectThetaAgainVelocity = -(thetaVelTemp / timeToCorrectThetaAgainVelocity);
+		
+		yTemp = yTemp + yVelTemp * timeToCorrectThetaAgain + 0.5 *timeToCorrectThetaAgain * timeToCorrectThetaAgain * (-g);
+		yVelTemp = yVelTemp + timeToCorrectThetaAgain * -g; //as there is no thrust applied
+		System.out.println("y after first half of theta corr " + yTemp);
+		System.out.println("yVel after first half of theta corr + yVelTemp");
+		
+		System.out.println("time needed to correct theta for slowing down " + timeToCorrectThetaAgain);
+		System.out.println("v needed to correct the theta of the lunar lander in this time " + vToCorrectThetaAgain);
 		System.out.println("theta after correcting this again " + thetaTemp);
-				
-		thetaVelTemp = thetaVelTemp + (vToCorrectThetaAgain * timeToCorrectThetaAgain);
 		System.out.println("angularvel is " + thetaVelTemp);
-				
-		timeToCorrectThetaAgainVelocity = -(0.5* thetaNeeded) / (0.5 * thetaVelTemp); //assuming constant acceleration (so thrust)
-		vToCorrectThetaAgainVelocity = (thetaVelTemp / timeToCorrectThetaAgainVelocity);
 		System.out.println("time to correct angular vel " + timeToCorrectThetaAgainVelocity);
 		System.out.println("thrust needed to correct angular vel " + vToCorrectThetaAgainVelocity);
 		
+		//calculate current values
+		thetaTemp = thetaTemp + 0.5 * timeToCorrectThetaAgainVelocity * timeToCorrectThetaAgainVelocity *vToCorrectThetaAgainVelocity + thetaVelTemp * timeToCorrectThetaAgainVelocity;
 		thetaVelTemp = (thetaVelTemp + vToCorrectThetaAgainVelocity * timeToCorrectThetaAgainVelocity);
-		System.out.println("new angular velocity is " + thetaVelTemp);
-		
-		thetaTemp = thetaTemp + timeToCorrectThetaAgainVelocity *vToCorrectThetaAgainVelocity + thetaVelTemp * timeToCorrectThetaAgainVelocity;
+		yTemp = yTemp + yVelTemp * timeToCorrectThetaAgainVelocity + 0.5 *timeToCorrectThetaAgainVelocity * timeToCorrectThetaAgainVelocity * (-g);
+		yVelTemp = yVelTemp + timeToCorrectThetaAgainVelocity * -g; //as there is no thrust applied
+		System.out.println("y after first half of theta corr " + yTemp);
+		System.out.println("yVel after first half of theta corr + yVelTemp");
 		System.out.println("the theta after full correction again " + thetaTemp);
-		thetaTemp = thetaNeeded;
-		
-		//two third of this is left - find velocity when x = 1/3 of x itself
-		xVelTemp = xVelTemp + timeToSpeedUpX *  uToSpeedUpX * Math.cos(thetaNeeded);
-		System.out.println("the velocity in the x direction is " + xVelTemp);
-		xTemp = xTemp - xVelTemp * timeToCorrectThetaAgainVelocity - 0.3333333333 *xTemp;
-		System.out.println("the x location after correcting is " + xTemp);
-		
-		//this isn't right: find another time, using uMax!!
-		timeToSlowDownX = xTemp / (0.5 * xVelTemp);
-		System.out.println("time to slow x down such that at 0.0 it will be zero as well: "+ timeToSlowDownX);
-		uToSlowDownX = xTemp / (Math.sin(thetaNeeded) * timeToSlowDownX);
-		System.out.println("the u needed to slow down x well enough is: " + uToSlowDownX);
+		System.out.println("new angular velocity is " + thetaVelTemp);
+		System.out.println();
+		System.out.println();
 	}
 	
-	/*
-	private long timeToCorrectThetaFinal;
-	private long timeToCorrectThetaFinalVelocity;
-	private long timeToCorrectYVelocityBeforeLanding;
+	//slows down until x has reached the point 0, and the velocity is 0 as well
+	public void correctXSlowDown() {
+		//find the current x value - the x needed to correct
+		xTemp = xTemp + xVelTemp * (timeToCorrectThetaAgainVelocity + timeToCorrectThetaAgain);
+		System.out.println("the velocity in the x direction is " + xVelTemp);
+		System.out.println("the x location after correcting is " + xTemp);
+		
+		//how long is needed to slow down with constant acc
+		timeToSlowDownX = Math.abs(xTemp / (0.5 * xVelTemp)); //slow down at the same rate
+		System.out.println("time to slow x down such that at 0.0 it will be zero as well: "+ timeToSlowDownX);
+		
+		//calculate which u is needed to slow down
+		double accNeeded = xVelTemp / timeToSlowDownX;
+		uToSlowDownX = Math.abs(accNeeded / Math.sin(thetaTemp));
+		
+		//calculate new values
+		xTemp = xTemp + xVelTemp * timeToSlowDownX + 0.5 * timeToSlowDownX * timeToSlowDownX * uToSlowDownX *Math.sin(thetaTemp);
+		xVelTemp = xVelTemp + timeToSlowDownX * uToSlowDownX * Math.sin(thetaTemp);	
+		yTemp = yTemp + timeToSlowDownX * yVelTemp + 0.5 * timeToSlowDownX * timeToSlowDownX * (uToSlowDownX * Math.cos(thetaTemp) - g);
+		yVelTemp = yVelTemp + timeToSlowDownX * (uToSlowDownX * Math.cos(thetaTemp) - g);
+		
+		System.out.println("the u needed to slow down x well enough is: " + uToSlowDownX);
+		System.out.println("remaining x velocity is " + xVelTemp);
+		System.out.println("remaining x is " + xTemp);
+		System.out.println("y after correcting x is " + yTemp);
+		System.out.println("y vel after correcting x is " + yTemp);
+		System.out.println();
+		System.out.println();
+	}
 	
-	private double vToCorrectThetaFinal;
-	private double vToCorrectThetaFinalVelocity;
-	
-	private double uToCorrectYVelocityBeforeLanding;
-	 */
-	
-	public void correctThetaAgain() {
+	//correct theta so it's 0, and the theta velocity is 0
+	public void correctThetaAgain() { 
 		double thetaNeeded = 0;
 		double timeNeeded = 0.001;
 		double temporaryV = 1000;
 		double tempMax;
+		double tempMaxVel;
 		
-		if (Math.abs(xTemp) > 0) {
+		//use maximum thrust, works the same way as the other theta corrections
+		if (thetaTemp >= 0) {
 			temporaryV = -temporaryV;
 			tempMax = -V_MAX;
 			
+			//there's no starting rotation velocity, so leave this out
 			while (temporaryV < tempMax) {
-				temporaryV =  (((0.5 * (thetaNeeded - thetaTemp))/timeNeeded) - thetaVelTemp)/timeNeeded;
-				timeNeeded = timeNeeded + 0.00001;
-				//System.out.println(temporaryV);
+				tempMaxVel = (thetaNeeded - thetaTemp)/timeNeeded -thetaVelTemp;
+				temporaryV = tempMaxVel / timeNeeded;
+				timeNeeded = timeNeeded + 0.0000001;
 			}
 		}
 		else {
-		
 			while (temporaryV > V_MAX) {
-				temporaryV =  ((((0.5 * (thetaNeeded) - thetaTemp))/timeNeeded) - thetaVelTemp)/timeNeeded;
-				timeNeeded = timeNeeded + 0.00001;
-				//System.out.println(temporaryV);
+				tempMaxVel = (thetaNeeded - thetaTemp)/timeNeeded -thetaVelTemp;
+				temporaryV = tempMaxVel / timeNeeded;
+				timeNeeded = timeNeeded + 0.0000001;
 			}
 		}
-		
 		timeToCorrectThetaFinal = timeNeeded;
 		vToCorrectThetaFinal = temporaryV;
+		
+		yTemp = yTemp + timeToCorrectThetaFinal * yVelTemp + 0.5 * timeToCorrectThetaFinal * timeToCorrectThetaFinal * -g;
+		yVelTemp = yVelTemp + -g * timeToCorrectThetaFinal;
+		
+		System.out.println("theta before correcting is " + thetaTemp);
 		System.out.println("time to correct theta final is " + timeToCorrectThetaFinal);
 		System.out.println("v needed to correct theta final is " + vToCorrectThetaFinal);
+		System.out.println("y after first part of theta correcting " + yVelTemp);
+		System.out.println("y vel after first part of theta correcting " + yVelTemp);
 		
-		thetaTemp = 0.5 * thetaTemp;
-		
-		//now slow down the velocity so the theta is constant
+		//calculate new values for the first half of the correction
+		thetaTemp = thetaTemp+ thetaVelTemp *timeToCorrectThetaFinal + 0.5 * timeToCorrectThetaFinal * timeToCorrectThetaFinal * vToCorrectThetaFinal;
 		thetaVelTemp = thetaVelTemp + vToCorrectThetaFinal * timeToCorrectThetaFinal;
-		System.out.println("angularvel is " + thetaVelTemp);
 		
-		timeToCorrectThetaFinalVelocity = (0.5 * thetaTemp) / (0.5 * thetaVelTemp); //assuming constant acceleration (so thrust)
-		vToCorrectThetaFinalVelocity = thetaVelTemp / timeToCorrectThetaFinalVelocity;
+		//calculates the v needed and the t needed for the last correction
+		timeToCorrectThetaFinalVelocity = Math.abs((thetaTemp) / (0.5 * thetaVelTemp)); //assuming constant acceleration (so thrust)
+		vToCorrectThetaFinalVelocity = -(thetaVelTemp / timeToCorrectThetaFinalVelocity);
+		
+		System.out.println("theta after first correction " + thetaTemp);
+		System.out.println("angularvel is " + thetaVelTemp);
 		System.out.println("time to correct angular vel final " + timeToCorrectThetaFirstVelocity);
 		System.out.println("thrust needed to correct angular vel final " + vToCorrectThetaFirstVelocity);
-		thetaTemp = thetaNeeded;
+		
+		//calculate new values according to the last correction
+		yTemp = yTemp + timeToCorrectThetaFinalVelocity * yVelTemp + 0.5 * timeToCorrectThetaFinalVelocity * timeToCorrectThetaFinalVelocity * -g;
+		yVelTemp = yVelTemp + -g * timeToCorrectThetaFinalVelocity;
+		thetaTemp = thetaTemp + thetaVelTemp * timeToCorrectThetaFinalVelocity + 0.5 * timeToCorrectThetaFinalVelocity * timeToCorrectThetaFinalVelocity * vToCorrectThetaFinalVelocity;
+		thetaVelTemp = thetaVelTemp + vToCorrectThetaFinalVelocity * timeToCorrectThetaFinalVelocity;
+		
+		System.out.println("final theta is " + thetaTemp);
+		System.out.println("final angular vel is "+ thetaVelTemp);
+		System.out.println("y before correcting it is " + yTemp);
+		System.out.println("y vel before correcting it is " + yVelTemp);
+		System.out.println();
+		System.out.println();
 	}
 	
-	public void correctYVelocity() {
-		//first find the y location at this point, and the yvelocity
-		//calculate this in the methods needed
-		//start correcting after it reaches 2/3rd of the y
-
+	//freefalls for half the way through, then starts correcting so at y =0, yvel = 0 as well
+	public void correctYVelocity() {	
+		double sNeeded = -(yGoal / 2);
+		double sNow = 0;
+		timeToLetYFall = 0.000001;
 		
-		timeToCorrectYVelocityBeforeLanding = yTemp / (0.5 * yVelTemp);
-		uToCorrectYVelocityBeforeLanding = ((yVelTemp / timeToCorrectYVelocityBeforeLanding) + g);
+		//find our which time is needed for the freefall
+		while (sNow > sNeeded) {
+			sNow = 0.5 * -g * timeToLetYFall * timeToLetYFall + yVelTemp * timeToLetYFall;
+			timeToLetYFall = timeToLetYFall + 0.0001;
+		}
+		//final theta is 0.0, final x is 0.0
+		yTemp = yTemp + sNow; //timeToLetYFall * 0.5 * timeToLetYFall * g - yVelTemp * timeToLetYFall;
+		yVelTemp = yVelTemp - g * timeToLetYFall; 
 		
+		System.out.println("freefall time is " + timeToLetYFall);
+		System.out.println("yTemp left after freefall " + yTemp);
+		System.out.println("yVelTemp after freefall " + yVelTemp);
+		
+		//calculate in which time an with which u, the y vel can be slowed down (with constant thrust)
+		timeToCorrectYVelocityBeforeLanding = Math.abs((yTemp) / (0.5 * yVelTemp));
+		uToCorrectYVelocityBeforeLanding = Math.abs((((yVelTemp)/ timeToCorrectYVelocityBeforeLanding))) + g;
+		yTemp = yTemp + yVelTemp * timeToCorrectYVelocityBeforeLanding + timeToCorrectYVelocityBeforeLanding * 0.5 * timeToCorrectYVelocityBeforeLanding * (uToCorrectYVelocityBeforeLanding - g);
+		yVelTemp = yVelTemp + timeToCorrectYVelocityBeforeLanding * (uToCorrectYVelocityBeforeLanding-g);
+	
 		System.out.println("thrust needed to correct y " + uToCorrectYVelocityBeforeLanding);
-		/*
-		double timeSlice = 10;
-		while (yTemp > 0) {
-			double toPrintYVel = yVelTemp + (uToCorrectYVelocityBeforeLanding * Math.cos(thetaTemp)) * timeSlice;
-			double toPrintY = yTemp - yVelTemp * timeSlice;
-			System.out.println("vel " + yVelTemp);
-			System.out.println("loc " + yTemp);
-		}	
-		*/
-		
+		System.out.println("time needed to correct y vel is " + timeToCorrectYVelocityBeforeLanding);
+		System.out.println("final y velocity is " + yVelTemp);
+		System.out.println("final y is " + yTemp);
+		System.out.println();
+		System.out.println();
 	}
 	
 }

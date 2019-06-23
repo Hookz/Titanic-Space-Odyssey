@@ -51,7 +51,7 @@ public class OpenLoopV3 {
     public static Vector2D thurster = new Vector2D();
     public static final double g = 1.352;
 
-    public static SpaceShip spaceShip = new SpaceShip(5000,50,350,0,600,600);
+    public static SpaceShip spaceShip = new SpaceShip(5000,50,350,0,600,600, true);
 
     public static double yDisplacement(double y0) {
         return y0/4;
