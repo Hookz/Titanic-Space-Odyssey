@@ -158,4 +158,7 @@ public class Vector3D {
         return this;
     }
 
+    public Vector3D copy() {
+        return new Vector3D(this.x, this.y, this.z);
+    }
 }
