@@ -28,7 +28,7 @@ public class BodySystem {
     public double update(double timeSlice) {
         // reset acceleration so we can accumulate acceleration due to gravitation from all bodies
         bodies.stream().forEach(i -> i.resetAcceleration()) ;
-
+        
         // add gravitation force to each body from each body
         for (int i = 0; i < bodies.size(); i++) {
             Body current = bodies.get(i);
@@ -40,8 +40,30 @@ public class BodySystem {
         }
         // update velocity and location for each body
         bodies.stream().forEach(i -> i.updateVelocityAndLocation(timeSlice)) ;
+        
+        //findVelocity(timeSlice);
+        //findLocation(timeSlice);
+        
         elapsedSeconds += timeSlice;
         return timeSlice;
+    }
+    
+    public void findVelocity(double timeSlice) {
+    	for (int i = 0; i < bodies.size(); i++) {
+    		bodies.get(i).calcAcc(bodies, timeSlice);
+    		System.out.println(bodies.get(i).acceleration);
+    		bodies.get(i).velocity.x = bodies.get(i).velocity.x + bodies.get(i).acceleration.x * timeSlice;
+    		bodies.get(i).velocity.y = bodies.get(i).velocity.y + bodies.get(i).acceleration.y * timeSlice;
+    		bodies.get(i).velocity.z = bodies.get(i).velocity.z + bodies.get(i).acceleration.z * timeSlice; 		
+    	}
+    }
+    
+    public void findLocation(double timeSlice) {
+    	for(int i = 0; i < bodies.size(); i++) {
+    		bodies.get(i).location.x = bodies.get(i).location.x +  bodies.get(i).velocity.x * timeSlice;
+    		bodies.get(i).location.y = bodies.get(i).location.y + bodies.get(i).velocity.y * timeSlice;
+    		bodies.get(i).location.z = bodies.get(i).location.z + bodies.get(i).velocity.z * timeSlice;
+    	}
     }
 
     public Optional<Body> getBody(String name) {
