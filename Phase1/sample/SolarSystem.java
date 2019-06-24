@@ -23,5 +23,4 @@ public class SolarSystem extends BodySystem {
             addBody(body);
         });
     }
-
 }

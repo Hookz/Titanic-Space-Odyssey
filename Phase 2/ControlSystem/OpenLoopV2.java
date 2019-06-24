@@ -298,7 +298,7 @@ public class OpenLoopV2 {
      * @param x0
      * @return
      */
-    public static double accelarationForXCorrection(double vxt, double x0) {
+    public static double accelerationForXCorrection(double vxt, double x0) {
         double a = vxt * vxt / (2 *x0);
         return a;
     }

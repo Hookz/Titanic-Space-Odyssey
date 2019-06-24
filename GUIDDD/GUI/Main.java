@@ -51,8 +51,10 @@ public class Main extends Application {
 	    
 	    // 2D
 	    BorderPane pane = new BorderPane();
-	    Button button = new Button();
-	    ToolBar toolBar = new ToolBar(button);
+	    Button playPause = new Button("\u25B6");
+	    Button forward6Button = new Button("\u25B6\u25B6");
+	    Button forward12Button = new Button("\u25B6\u25B6\u25B6");
+	    ToolBar toolBar = new ToolBar(playPause,forward6Button,forward12Button);
 	    toolBar.setOrientation(Orientation.VERTICAL);
 	    pane.setCenter(subScene);
 	    pane.setPrefSize(300,300);
@@ -70,19 +72,19 @@ public class Main extends Application {
 		
 		primaryStage.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
 			   switch (event.getCode()) {
-			   	case Y:
+			   	case D:
 			   		camera.getTransforms().add(new Rotate(10, Rotate.Y_AXIS));
 			   		break;
 			   
-			   	case H:
+			   	case A:
 			   		camera.getTransforms().add(new Rotate(-10, Rotate.Y_AXIS));
 			   		break;
 			   
-			   	case X:
+			   	case S:
 			   		camera.getTransforms().add(new Rotate(-10, Rotate.X_AXIS));
 			   		break;
 				   
-			   	case S:
+			   	case W:
 			   		camera.getTransforms().add(new Rotate(10, Rotate.X_AXIS));
 			   		break;
 			   }

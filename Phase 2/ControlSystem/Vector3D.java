@@ -6,6 +6,9 @@ public class Vector3D {
     protected double z;
 
     public Vector3D() {
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
     }
 
     public Vector3D(double[] vec2D) {
@@ -151,7 +154,7 @@ public class Vector3D {
         return unitVec;
     }
 
-    public Vector3D multiplyDimencions(Vector3D other){
+    public Vector3D multiplyDimensions(Vector3D other){
         this.x *= other.x;
         this.y *= other.y;
         this.z *= other.z;
