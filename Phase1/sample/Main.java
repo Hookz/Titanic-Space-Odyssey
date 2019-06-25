@@ -65,7 +65,7 @@ public class Main extends Application {
     private Label launchLabel;
     private Label launchLabel2;
     private int i = 0;
-
+    private boolean toEarth =false;
     @Override
     public void start(Stage stage) {
         createBodies();
@@ -115,7 +115,7 @@ public class Main extends Application {
         			r.location =bodySystem.getBodies().get(4).getLocation().copy();
         			i++;
         		}
-        		r.calculateVelocityFromThrust(r.earthToTitan, TIME_SLICE);
+        		r.calculateVelocityFromThrust(r.earthToTitan, TIME_SLICE,Trajectory.timeToTitan);
         		gc.setFill(Color.BLACK);
         		
         		double otherX = transformer.modelToOtherX(r.location.x);
@@ -125,22 +125,27 @@ public class Main extends Application {
         		gc.fillOval(otherX, otherY, 6, 6);
         		//gc.fillText("Titanic", r.location.x + 10, r.location.y + 10);
         		gc.fillText("Titanic", otherX + 5, otherY+ 5);
-        		System.out.println("yassss");
-        	}else if(bodySystem.getSeconds()>Trajectory.launchToEarth && Trajectory.landOnEarth>bodySystem.getSeconds()){
-        		if ( i ==1) {
-        			r.location = bodySystem.getBodies().get(10).getLocation().copy();
+
+        	}else if(bodySystem.getSeconds()>Trajectory.launchToEarth/* && Trajectory.landOnEarth>bodySystem.getSeconds()*/){
+        	    if (!toEarth){
+                  r.velocity.x=0;
+                  r.velocity.y=0;
+                  r.velocity.z=0;
+                  toEarth = true;
+              }
+        	    if ( i ==1) {
+        			r.location = bodySystem.getBodies().get(9).getLocation().copy();
         			i++;
         		}
         		double otherX = transformer.modelToOtherX(r.location.x);
         		double otherY = transformer.modelToOtherY(r.location.y);
         		
-        		r.calculateVelocityFromThrust(r.titanToEarth, TIME_SLICE);
+        		r.calculateVelocityFromThrust(r.titanToEarth, TIME_SLICE, Trajectory.timeToEarth);
         		gc.setFill(Color.BLACK);
         		//gc.fillOval(r.location.x - 3, r.location.y - 3, 3*2, 3* 2);
         		gc.fillOval(otherX, otherY, 6, 6);
         		//gc.fillText("Earthanic", r.location.x + 10, r.location.y + 10);
         		gc.fillText("Earthanic", otherX + 5, otherY + 5);
-        		System.out.print("woop");
         	}
         }
 

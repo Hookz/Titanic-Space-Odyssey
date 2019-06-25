@@ -28,6 +28,7 @@ public class RocketModel {
     public long launchToEarth;
     public long landOnEarth;
     public long secondsOfThrust = 0;
+    public long timeToTitan, timeToEarth;
 
     public RocketModel(Vector3D location, Vector3D finalEarth, Vector3D finalTitan) {
         this.location = location;
@@ -37,38 +38,51 @@ public class RocketModel {
         this.velocity = new Vector3D(0,0,0);
     }
 
+//    public static void main(String[] args){
+//        Vector3D v = new Vector3D(0,0,0);
+//        Vector3D d = new Vector3D(1,0,0);
+//        RocketModel r = new RocketModel(v,v,v);
+//        for(int i = 1000000; i<6000000; i+=20000){
+//            System.out.println(/*(i+MASS_EMPTY)+"      "+*/r.velocity.x);
+//            r.velocity.x = 0;
+//            r.location.x = 0;
+//            r.massOfFuel = i;
+//            r.calculateVelocityFromThrust(d,100,0);
+//        }
+//    }
+
     /**
      *
      * @param directionVector vector of the direction in which thrust is to be applied.
+     * @param timeSlice this is the timeslice of the calling class. Allows for the hruster to be applied in smaller increments than whatever timeSlice the
+     *                  other class decides to use
+     * @param time is a placeholder for the amount of time available to reach target.
      * This method calculates the velocity by using the thrust for the implemented timestep
      * by transforming the directional vector into a unit vector the undirectional magnitude of the thrust
      * can be simply applied in the wanted direction
      *
      */
 
-    //TODO while below required speed -> thrust
-    public void calculateVelocityFromThrust(final Vector3D directionVector, final long timeSlice){
+    public void calculateVelocityFromThrust(final Vector3D directionVector, final long timeSlice, long time){
         Vector3D directionUnitVector;
-        double speedToReach = speedToReach(directionVector.length());
-        System.out.println((THRUST_AT_VACUUM*timeSlice)/(massOfFuel+MASS_EMPTY));
-        while (velocity.length()<speedToReach || secondsOfThrust<=timeSlice) {
+        double thrustSlice = 1;
+        double speedToReach = speedToReach(directionVector.length(), time);
+        while ((velocity.length()<speedToReach || secondsOfThrust<=timeSlice) &&  massOfFuel>=0) {
             directionUnitVector = directionVector.normalize();
             if (inSpace) {
-                directionUnitVector.mul((THRUST_AT_VACUUM*timeSlice)/(massOfFuel+MASS_EMPTY));
+                directionUnitVector.mul((THRUST_AT_VACUUM*thrustSlice)/(massOfFuel+MASS_EMPTY));
                 velocity.add(directionUnitVector);
-                massOfFuel -= (FUEL_MASS_FLOW_RATE);
-                secondsOfThrust++;
+                massOfFuel =(massOfFuel - (FUEL_MASS_FLOW_RATE * thrustSlice));
             } else {
-                directionUnitVector.mul((THRUST_AT_SL*timeSlice)/(massOfFuel+MASS_EMPTY));
+                directionUnitVector.mul((THRUST_AT_SL * thrustSlice) / (massOfFuel + MASS_EMPTY));
                 velocity.add(directionUnitVector);
-                massOfFuel -= (FUEL_MASS_FLOW_RATE);
-                secondsOfThrust++;
+                massOfFuel =(massOfFuel - (FUEL_MASS_FLOW_RATE * thrustSlice));
             }
-        }updateLocation(velocity, timeSlice);
-        System.out.println(this.velocity.length());
-
-        System.out.println("Seconds of Thrust = "+secondsOfThrust);
-        System.out.println("____________________________________________");
+//           if((((int)(thrustSlice*10))%10)!= 0){
+                secondsOfThrust++;
+//           }
+        } System.out.println("fuel used: "+ (4000000-massOfFuel));
+        updateLocation(velocity, timeSlice);
 
     }
 
@@ -83,6 +97,7 @@ public class RocketModel {
     public double calcGeostationaryOrbitHeight(final Body body, final double rotationalPeriod){
         double r;
         double m2 = body.mass;
+
         r = Math.cbrt((Physics.G*m2*rotationalPeriod*rotationalPeriod)/(4*Math.PI*Math.PI));
         r -= body.radius; //we remove the radius of the body we are orbiting as the above equation gives us the distance from the centre of gravity
         return r;
@@ -94,11 +109,10 @@ public class RocketModel {
     }
 
     //TODO implement required speed. S=v/t from SUVAT equations
-    public double speedToReach(final double distance){
+    public double speedToReach(final double distance, long time){
         double velocity;
-        double timeInSeconds = 60*60*24*365*2.5;
-        velocity = distance/timeInSeconds;
-        System.out.println("required Velocity= "+velocity);
+        double timeInSeconds = 60*60*24*365*2.35;
+        velocity = distance/(timeInSeconds);
         return velocity;
     }
 }

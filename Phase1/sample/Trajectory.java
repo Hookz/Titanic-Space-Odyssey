@@ -17,6 +17,8 @@ public class Trajectory {
     public static Vector3D titanToEarth;
     public static long launchToEarth;
     public static long landOnEarth;
+    public static long timeToTitan;
+    public static long timeToEarth;
 
     public static long asLong(String str){
         long timeOfLaunch;
@@ -197,7 +199,8 @@ public class Trajectory {
         System.out.println("At launch earth position is (x, y, z): " + "(" + toEarth.x + ", " + toEarth.y + ", " + toEarth.z + ")");
         System.out.println("The titan position at landing is (x, y, z): " + "(" + fromTitan.x + ", " + fromTitan.y + ", " + fromTitan.z + ")");
         System.out.println("time of launch " + launchToEarth + " seconds");
-
+        timeToTitan = landOnTitan - launchToTitan;
+        timeToEarth = landOnEarth - launchToEarth;
        }
 
 
