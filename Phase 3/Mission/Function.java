@@ -1,5 +1,5 @@
 package Mission;
 
 public interface Function {
-    public double f(double x);
+    double f(double x);
 }

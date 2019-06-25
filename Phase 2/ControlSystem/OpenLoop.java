@@ -13,7 +13,7 @@ public class OpenLoop {
 //        double trotate = timeForHalfRotation(36,1.2);
         double u = mainThruster(2.4E-15);
         double mu = mainThrusterForce(1.25E-15,100, 2.4E-15);
-        double a = accelarationForXCorrection(1.25E-15, 100);
+        double a = accelerationForXCorrection(1.25E-15, 100);
         double rotate = findRotation(31.6, a, initialVelocity.getY(), 0.5);
         double trotate = timeForHalfRotation(36,a);
         double rotateX = rotateSpaceCraftForX(31.6, 30, 0, 100);
@@ -109,7 +109,7 @@ public class OpenLoop {
      * @param x0
      * @return
      */
-    public static double accelarationForXCorrection(double vxt, double x0) {
+    public static double accelerationForXCorrection(double vxt, double x0) {
         double a = vxt * vxt / (2 *x0);
         return a;
     }

@@ -1,5 +1,8 @@
 package sample;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Body {
     public Vector3D location;
     public Vector3D velocity;
@@ -12,7 +15,6 @@ public class Body {
     public double radius;
 
     public String name;
-
 
     public Body() {
         if (acceleration == null) {
@@ -110,26 +112,97 @@ public class Body {
         Vector3D locationByVelocity = new Vector3D(averageVelocity).mul(timeSlice);
         location.add(locationByVelocity);
     }
-
+    
+    /* 
     protected void updateVelocityAndLocationRK4(double timeSlice) {
     	Vector3D kOneLoc = this.velocity.copy();
-    	Vector3D kOneVel = (this.acceleration.copy()).mulVec((this.location.copy()));
+    	Vector3D kOneVel = 
     	
     	Vector3D kTwoLoc = this.velocity.copy().mulVec(kOneVel.copy().mul(timeSlice / 2));
-    	Vector3D kTwoVel = this.acceleration.copy().mulVec(this.location.copy().add(kOneLoc).copy().mul(timeSlice/2));
+    	Vector3D kTwoVel = 
     	
     	Vector3D kThreeLoc = this.velocity.copy().mulVec(kTwoVel.copy().mul(timeSlice/2));
-    	Vector3D kThreeVel = (this.acceleration.copy()).mulVec((this.location.copy()).add(kTwoLoc.copy().mul(timeSlice / 2)));
+    	Vector3D kThreeVel = 
     	
     	Vector3D kFourLoc = this.velocity.copy().mulVec(kThreeVel.copy().mul(timeSlice));
-    	Vector3D kFourVel = (this.acceleration.copy()).mulVec((this.location.copy()).add(kThreeLoc.copy().mul(timeSlice)));
+    	Vector3D kFourVel = 
     	
     	Vector3D kAllVel = kOneVel.add((kTwoVel.mul(2)).add((kThreeVel).mul(2)).add(kFourVel));
     	Vector3D kAllLoc = kOneLoc.add((kTwoLoc.mul(2)).add((kThreeLoc).mul(2)).add(kFourLoc));
-    	this.velocity = this.velocity.add((kAllVel).mul((timeSlice / 6)));
-    	this.location = this.location.add((kAllLoc).mul(timeSlice / 6));
+    	this.velocity = this.velocity.add(kAllVel.mul(timeSlice / 6));
+    	this.location = this.location.add(kAllLoc.mul(timeSlice / 6));
     	System.out.println("loc: x " + location.x + " y " + location.y + " z " + location.z);
     	System.out.println("vel: x " + velocity.x + " y " + velocity.y + " z " + velocity.z);
+    }*/
+    
+    public void calcAcc(List<Body> bodies, double timeSlice) {
+    	this.acceleration = new Vector3D(0, 0, 0);
+    	final double G = Physics.G;
+    	
+    	Vector3D kOne = new Vector3D(0, 0, 0);
+    	Vector3D kTwo = new Vector3D(0, 0, 0);
+    	Vector3D kThree = new Vector3D(0, 0, 0);
+    	Vector3D kFour = new Vector3D(0, 0, 0);
+    	
+    	Vector3D locationNow = new Vector3D(0, 0, 0);
+    	Vector3D velocityNow = new Vector3D(0, 0, 0);
+    	
+    	
+    	//add velocity now and location now!!!
+    	for (int j = 0; bodies.size() > j; j++) {
+    		if (!this.name.equalsIgnoreCase(bodies.get(j).name)) {
+    			double temp = Math.pow((this.location.x - bodies.get(j).location.x),2) + Math.pow((this.location.y - bodies.get(j).location.y),2) + Math.pow((this.location.z - bodies.get(j).location.z),2);
+    			double attr = Math.sqrt(temp);
+    			//System.out.println(attr);
+    			//System.out.println(bodies.get(j).name);
+    			double accl =  (G * bodies.get(j).mass / Math.pow(attr, 3));
+    			
+    			kOne.x = accl * (bodies.get(j).location.x - this.location.x);
+    			kOne.y = accl * (bodies.get(j).location.y - this.location.y);
+    			kOne.z = accl * (bodies.get(j).location.z - this.location.z);
+    			//System.out.println(kOne);
+    			
+    			velocityNow.x = this.velocity.x + kOne.x * 0.5;
+    			velocityNow.y = this.velocity.y + kOne.y * 0.5;
+    			velocityNow.z = this.velocity.z + kOne.z * 0.5;
+    			
+    			locationNow.x = this.location.x + velocityNow.x * 0.5;
+    			locationNow.y = this.location.y + velocityNow.y * 0.5;
+    			locationNow.z = this.location.z + velocityNow.z * 0.5;
+    			
+    			kTwo.x = accl * (locationNow.x - (locationNow.x + velocityNow.x * 0.5 * timeSlice));
+    			kTwo.y = accl * (locationNow.x - (locationNow.y + velocityNow.y * 0.5 * timeSlice));
+    			kTwo.z = accl * (locationNow.x - (locationNow.z + velocityNow.z * 0.5 * timeSlice));
+    			//System.out.println(kTwo);
+    			
+    			velocityNow.x = this.velocity.x + kTwo.x * 0.5;
+    			velocityNow.y = this.velocity.y + kTwo.y * 0.5;
+    			velocityNow.z = this.velocity.z + kTwo.z * 0.5;
+    			
+    			kThree.x = accl * (locationNow.x - (locationNow.x + velocityNow.x * 0.5 * timeSlice));
+    			kThree.y = accl * (locationNow.x - (locationNow.y + velocityNow.y * 0.5 * timeSlice));
+    			kThree.z = accl * (locationNow.x - (locationNow.z + velocityNow.z * 0.5 * timeSlice));
+    			//System.out.println(kThree);
+    			
+    			velocityNow.x = this.velocity.x + kThree.x;
+    			velocityNow.y = this.velocity.y + kThree.y;
+    			velocityNow.z = this.velocity.z + kThree.z;
+    			
+    			locationNow.x = this.location.x + velocityNow.x * 0.5;
+    			locationNow.y = this.location.y + velocityNow.y * 0.5;
+    			locationNow.z = this.location.z + velocityNow.z * 0.5;
+    	
+    			kFour.x = accl * (bodies.get(j).location.x - (locationNow.x + velocityNow.x * timeSlice));
+    			kFour.y = accl * (bodies.get(j).location.y - (locationNow.y + velocityNow.y * timeSlice));
+    			kFour.z = accl * (bodies.get(j).location.z - (locationNow.z + velocityNow.z * timeSlice));
+    			//System.out.println(kFour);
+    			
+    			this.acceleration.x = this.acceleration.x + ((kOne.x + 2 * kTwo.x + 2 * kThree.x + kFour.x) / 6);
+    			this.acceleration.y = this.acceleration.y + ((kOne.y + 2 * kTwo.y + 2 * kThree.y + kFour.y) / 6);
+    			this.acceleration.z = this.acceleration.z + ((kOne.z + 2 * kTwo.z + 2 * kThree.z + kFour.z) / 6);
+    		
+    		}
+    	}
     }
     
     @Override

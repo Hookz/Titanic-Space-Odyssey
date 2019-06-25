@@ -48,7 +48,7 @@ public class OpenLoopV3 {
     }
 
     public static Vector3D velocity = new Vector3D(0.1,0.1,0.1);
-    public static Vector2D thurster = new Vector2D();
+    public static Vector2D thruster = new Vector2D();
     public static final double g = 1.352;
 
     public static SpaceShip spaceShip = new SpaceShip(5000,50,350,0,600,600, true);
@@ -84,9 +84,9 @@ public class OpenLoopV3 {
         System.out.println("T velocity y: " + velocity.y);
         //fully rotated
         System.out.println("T coordinate y: " + spaceShip.coordinates.z);
-        thurster.x = g / Math.cos(spaceShip.coordinates.z);
-        System.out.println("T thruster y: " + thurster.x);
-        spaceShip.coordinates.y = thurster.x * Math.cos(spaceShip.coordinates.z) - g;
+        thruster.x = g / Math.cos(spaceShip.coordinates.z);
+        System.out.println("T thruster y: " + thruster.x);
+        spaceShip.coordinates.y = thruster.x * Math.cos(spaceShip.coordinates.z) - g;
         System.out.println("T new y: " + spaceShip.coordinates.y);
     }
 
@@ -98,9 +98,9 @@ public class OpenLoopV3 {
         System.out.println("T a x: " + a);
         velocity.x = velocity.x + a * t;
         System.out.println("T new velocity x: " + velocity.x);
-        thurster.x = velocity.x * velocity.x / (2 * tempCoordinate.x * Math.sin(spaceShip.coordinates.z));
-        System.out.println("T thruster x: " + thurster.x); //print this out
-        tempCoordinate.x = thurster.x * Math.sin(spaceShip.coordinates.z);
+        thruster.x = velocity.x * velocity.x / (2 * tempCoordinate.x * Math.sin(spaceShip.coordinates.z));
+        System.out.println("T thruster x: " + thruster.x); //print this out
+        tempCoordinate.x = thruster.x * Math.sin(spaceShip.coordinates.z);
         System.out.println("New x: " + tempCoordinate.x); //plot x
     }
 
