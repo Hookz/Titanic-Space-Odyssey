@@ -38,18 +38,6 @@ public class RocketModel {
         this.velocity = new Vector3D(0,0,0);
     }
 
-//    public static void main(String[] args){
-//        Vector3D v = new Vector3D(0,0,0);
-//        Vector3D d = new Vector3D(1,0,0);
-//        RocketModel r = new RocketModel(v,v,v);
-//        for(int i = 1000000; i<6000000; i+=20000){
-//            System.out.println(/*(i+MASS_EMPTY)+"      "+*/r.velocity.x);
-//            r.velocity.x = 0;
-//            r.location.x = 0;
-//            r.massOfFuel = i;
-//            r.calculateVelocityFromThrust(d,100,0);
-//        }
-//    }
 
     /**
      *
@@ -81,8 +69,7 @@ public class RocketModel {
 //           if((((int)(thrustSlice*10))%10)!= 0){
                 secondsOfThrust++;
 //           }
-        } System.out.println("fuel used: "+ (4000000-massOfFuel));
-        updateLocation(velocity, timeSlice);
+        } updateLocation(velocity, timeSlice);
 
     }
 

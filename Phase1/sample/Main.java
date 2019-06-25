@@ -125,6 +125,7 @@ public class Main extends Application {
         		gc.fillOval(otherX, otherY, 6, 6);
         		//gc.fillText("Titanic", r.location.x + 10, r.location.y + 10);
         		gc.fillText("Titanic", otherX + 5, otherY+ 5);
+        		System.out.println(r.massOfFuel);
 
         	}else if(bodySystem.getSeconds()>Trajectory.launchToEarth/* && Trajectory.landOnEarth>bodySystem.getSeconds()*/){
         	    if (!toEarth){
@@ -146,7 +147,9 @@ public class Main extends Application {
         		gc.fillOval(otherX, otherY, 6, 6);
         		//gc.fillText("Earthanic", r.location.x + 10, r.location.y + 10);
         		gc.fillText("Earthanic", otherX + 5, otherY + 5);
-        	}
+        		System.out.println( r.massOfFuel);
+
+          }
         }
 
         for (Body body : bodySystem.getBodies()) {

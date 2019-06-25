@@ -180,21 +180,22 @@ public class Trajectory {
 
         Vector3D toEarth = null;
         Vector3D fromTitan = null;
+        String time2 = null;
         double newMinDistance = Double.MAX_VALUE;
-        for(int i = stoppingIndex+2; i < earthPositions.size(); i++) {
+        for(int i = stoppingIndex+5; i < earthPositions.size(); i++) {
             double distance = earthPositions.get(i).distance(titanPositions.get(i-5));
 
             if(distance < newMinDistance) {
-                 toEarth = earthPositions.get(i);
+                toEarth = earthPositions.get(i);
                 fromTitan = titanPositions.get(i-5);
                 titanToEarth = toEarth.sub(fromTitan);
                 launchToEarth = Trajectory.asLong(time.get(i-5));
                 landOnEarth = Trajectory.asLong(time.get(i));
                 newMinDistance = distance;
-
+                time2 = time.get(i);
             }
         }
-
+        System.out.println(time2);
         System.out.println("The distance is of travel: " + newMinDistance);
         System.out.println("At launch earth position is (x, y, z): " + "(" + toEarth.x + ", " + toEarth.y + ", " + toEarth.z + ")");
         System.out.println("The titan position at landing is (x, y, z): " + "(" + fromTitan.x + ", " + fromTitan.y + ", " + fromTitan.z + ")");
