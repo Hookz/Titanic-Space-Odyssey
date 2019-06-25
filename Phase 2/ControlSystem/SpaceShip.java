@@ -316,5 +316,12 @@ public class SpaceShip extends Wind {
 
         return String.format("xAxis = %f, yAxis = %f, theta = %f", coordinates.getX(), coordinates.getY(), coordinates.getZ());
     }
+	public SpaceShip copy() {
+		SpaceShip copy = new SpaceShip(this.mass, this.getXLocation(), this.getYLocation(), this.getTilt(), this.height, this.width, this.titan);
+		copy.setAcceleration(acceleration.copy());
+		copy.setVelocity(this.velocity.copy());
+		copy.setRotationAcceleration(this.rotationAcceleration);
+		return copy;
+	}
 }
 

@@ -1,6 +1,9 @@
 package OpenLoopAgain;
 
+import java.util.ArrayList;
+
 import ControlSystem.Vector2D;
+import Land.LunarLanderLaunch;
 import Land.SpaceShip;
 
 //this class is done - just for the test
@@ -21,6 +24,8 @@ public class Testing {
 		
 		SpaceShip spaceShip = new SpaceShip(10000, velocity, acceleration, location, height, width, titan );
 		OpenLoopV4 landingTitan = new OpenLoopV4(spaceShip, g);		
+		LunarLanderLaunch launch = new LunarLanderLaunch(new Vector2D(500, 300000), spaceShip.copy(), 0.1);
+		ArrayList<Vector2D> positions = launch.fullLaunch();
 		
 		/*
 		while (timePassed < landingTitan.timeToCorrectThetaFinalVelocity) {
@@ -37,8 +42,16 @@ public class Testing {
 		}
 		*/
 		
+		/*
 		for (int i = 0; i < landingTitan.getLocations().size(); i++) {
 			System.out.println(" x = " + landingTitan.getLocations().get(i).x + " y = " + landingTitan.getLocations().get(i).y);
 		}
+		*/
+		
+		/*
+		for (int i = 0; i < positions.size(); i++ ) {
+			System.out.println(positions.get(i));
+		}
+		*/
 	}
 }

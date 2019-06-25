@@ -1,5 +1,6 @@
 package Land;
 
+
 	import java.text.DecimalFormat;
 	import java.util.ArrayList;
 	import javafx.animation.KeyFrame;
@@ -21,12 +22,15 @@ package Land;
 	import javafx.util.Duration;
 	import javafx.scene.control.Button;
 	import javafx.scene.text.Font;
+	import ControlSystem.ClosedLoopV2;
 	import ControlSystem.Vector2D;
-import OpenLoopAgain.OpenLoopV4;
+	import OpenLoopAgain.OpenLoopV4;
+	import ControlSystem.SpaceShip;
+	
 	public class Main2 extends Application {
 		
 	    //second to update the model(deltaT)
-	    public final double TIME_SLICE = 0.01;
+	    public final double TIME_SLICE = 0.1;
 
 	    private static final int BOTTOM_AREA_HEIGHT = 100;
 	    
@@ -54,15 +58,18 @@ import OpenLoopAgain.OpenLoopV4;
 	    private Button playBackButton;
 	    private boolean change = false;
 	    private double spaceshipMass = 10000; // kg
-	    public SpaceShip spaceShip;
-	    public SpaceShip spaceShip2;
+	    public Land.SpaceShip spaceShip;
+	    public Land.SpaceShip spaceShip2;
+	    public ControlSystem.SpaceShip spaceShip3;
 	    public OpenLoopV4 openLoop;
+	    public ClosedLoopV2 closedLoop;
 	    
 	    //private Vector2D locLanding;
 	    private Button restartApplication;
 	    private int currentSpaceShip = 0;
-	    private ArrayList<SpaceShip> oldSpaceShips = new ArrayList<>();
+	    private ArrayList<Land.SpaceShip> oldSpaceShips = new ArrayList<>();
 	    private HBox buttons;
+	    private int iterations = 0;
 
 	    void cleanup() {
 	        fps = new FPSCounter();
@@ -99,7 +106,7 @@ import OpenLoopAgain.OpenLoopV4;
 	        Timeline timeline = new Timeline();
 	        timeline.setCycleCount(Timeline.INDEFINITE);
 	        KeyFrame kf = new KeyFrame(
-	                Duration.millis(1),
+	                Duration.millis(2),
 	                new EventHandler<ActionEvent>() {
 	                    public void handle(ActionEvent ae) {
 	                        updateFrame(gc);
@@ -162,18 +169,23 @@ import OpenLoopAgain.OpenLoopV4;
 	        	change = false;
 	        }
 	        
-	        for (SpaceShip spaces : oldSpaceShips) {
-	        gc.fillOval(spaces.getLocation().getX() / REAL_SCALE + TRANSLATE_COOR, TRANSLATE_COOR_TWO - (spaces.getLocation().getY() / REAL_SCALE + 0.5 * spaceShip.getHeight()), 5, 5 );
+	        for (Land.SpaceShip spaces : oldSpaceShips) {
+	        //gc.fillOval(spaces.getLocation().getX() / REAL_SCALE + TRANSLATE_COOR, TRANSLATE_COOR_TWO - (spaces.getLocation().getY() / REAL_SCALE + 0.5 * spaceShip.getHeight()), 5, 5 );
 	        }
 	        
-	        gc.fillRect((spaceShip.getLocation().getX() / REAL_SCALE + TRANSLATE_COOR), TRANSLATE_COOR_TWO -(spaceShip.getLocation().getY() / REAL_SCALE + 0.5 * spaceShip.getHeight()) , spaceShip.getWidth(), spaceShip.getHeight());
-	        gc.fillRect((spaceShip2.getLocation().getX() / REAL_SCALE + TRANSLATE_COOR),TRANSLATE_COOR_TWO -(spaceShip2.getLocation().getY() / REAL_SCALE + 0.5 * spaceShip2.getHeight()), spaceShip2.getWidth(), spaceShip2.getHeight());
+	        gc.fillRect((spaceShip.getLocation().getX() / REAL_SCALE + TRANSLATE_COOR), TRANSLATE_COOR_TWO -(spaceShip.getLocation().getY() / REAL_SCALE + spaceShip.getHeight()) , spaceShip.getWidth(), spaceShip.getHeight());
+	        //gc.fillRect((spaceShip2.getLocation().getX() / REAL_SCALE + TRANSLATE_COOR),TRANSLATE_COOR_TWO -(spaceShip2.getLocation().getY() / REAL_SCALE + 0.5 * spaceShip2.getHeight()), spaceShip2.getWidth(), spaceShip2.getHeight());
+	        //gc.fillRect((spaceShip3.getLocation().getX() / REAL_SCALE + TRANSLATE_COOR), TRANSLATE_COOR_TWO -(spaceShip3.getLocation().getY() / REAL_SCALE + spaceShip3.getHeight()) , spaceShip3.getWidth(), spaceShip3.getHeight());
 	        
-	        if (!paused) {//the normal s
-	        	spaceShip2.update(TIME_SLICE);
-	        	System.out.println(spaceShip2.getYLocation());
-	        	System.out.println(spaceShip2.getXLocation());
-	        	openLoop.update(TIME_SLICE);
+	        if (!paused && iterations < openLoop.getLocations().size()) {//the normal s
+	        	spaceShip.setLocation(openLoop.getLocations().get(iterations));
+	        	//spaceShip3.setLocation(new Vector2D(closedLoop.successfullCoordinate.get(iterations).getX(), closedLoop.successfullCoordinate.get(iterations).getX()));
+	        	//spaceShip2.update(TIME_SLICE);
+	        	//System.out.println(spaceShip2.getYLocation());
+	        	//System.out.println(spaceShip2.getXLocation());
+	        	//openLoop.update(TIME_SLICE);
+	        	//spaceShip2.setLocation(new Vector2D(closedLoop.successfullCoordinate.get(iterations).getX(), closedLoop.successfullCoordinate.get(iterations).getY()));
+	        	iterations++;
 	            timeLabel.setText(spaceShip2.getElapsedTimeAsString());
 	            if(spaceShip.getSeconds()% (60*60) == 0) {//every 10 min, save a copy
 	            	oldSpaceShips.add(spaceShip.copy());
@@ -191,16 +203,19 @@ import OpenLoopAgain.OpenLoopV4;
 	    
 	    private void createSpaceship() {
 	    	//arbitrary numbers:
-	    	Vector2D spaceshipLoc = new ControlSystem.Vector2D(500, 300*1000); //the location of the upper left corner of the spaceShip - it's 400 km away from Titan
+	    	Vector2D spaceshipLoc = new ControlSystem.Vector2D(5000, 300*1000); //the location of the upper left corner of the spaceShip - it's 400 km away from Titan
 	    	double length = 17; //in m
 	    	double width = 4.5; //in m
 	    	
-	    	spaceShip = new SpaceShip(this.spaceshipMass, new Vector2D(), new Vector2D(), spaceshipLoc, length, width, true );
-	    	spaceShip2 = new SpaceShip(this.spaceshipMass, new Vector2D(), new Vector2D(), spaceshipLoc.copy(), length, width, true);
-			openLoop = new OpenLoopV4(spaceShip, ControlSystem.SpaceShip.GRAV_TITAN);		
+	    	spaceShip = new Land.SpaceShip(this.spaceshipMass, new Vector2D(), new Vector2D(), spaceshipLoc, length, width, true );
+	    	spaceShip2 = new Land.SpaceShip(this.spaceshipMass, new Vector2D(), new Vector2D(), spaceshipLoc.copy(), length, width, true);
+			spaceShip3 = new SpaceShip(this.spaceshipMass, spaceshipLoc.x, spaceshipLoc.y, 0, length, width, true);
+			
+	    	openLoop = new OpenLoopV4(spaceShip, ControlSystem.SpaceShip.GRAV_TITAN);
+	    	//closedLoop = new ClosedLoopV2(spaceShip3.copy());
+	    	//closedLoop.helperClosedLoop();
 	    }
-
-
+	    
 	    private GraphicsContext createGui(Stage stage) {
 	        BorderPane border = new BorderPane();
 	        createTimeLabel();

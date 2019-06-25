@@ -6,19 +6,26 @@ public class ClosedLoopV2 {
     public static Vector3D velocity = new Vector3D(0.1,0.1,0.1);
     public static Vector2D thurster = new Vector2D();
     public static final double g = 1.352;
+    public static ODESolvers solvers;
 
 
-    public static SpaceShip spaceShip = new SpaceShip(5000,200,700,0.0,600,600, true);
+    public static SpaceShip spaceShip;//= new SpaceShip(5000,200,700,0.0,600,600, true);
     public static boolean landed = false;
     public static ArrayList<Vector3D> successfullCoordinate;
 
+    public ClosedLoopV2(SpaceShip spaceship) {
+    	this.spaceShip = spaceship;
+    	this.solvers = new ODESolvers(spaceship);
+
+    }
+    
     public static ArrayList<Vector3D> storeCoordinate() {
         ArrayList<Vector3D> coordinatesList = new ArrayList<>();
         Vector2D thruster = new Vector2D(0,0); //x is u, y is v
 
         double timePassed = 0.1; //ten seconds
         double totalTime = 100000;
-        double oldY = spaceShip.coordinates.y;
+        double oldY = spaceShip.coordinates.getY();
         spaceShip.coordinates.setY(oldY - oldY*timePassed);
 
         //while loop itereation
@@ -49,7 +56,9 @@ public class ClosedLoopV2 {
             thurster.setX(velocity.getX() * velocity.getX() / (2 * tempLocation.getX() * Math.sin(spaceShip.coordinates.getZ())));
             spaceShip.coordinates.setX(thurster.getX() * Math.sin(spaceShip.coordinates.getZ()));
 
-            double vDot = rungeKutta4rth(t, velocity.getZ(), 1, spaceShip.TIME_SLICE);
+            
+            //double vDot = rungeKutta4rth(t, velocity.getZ(), 1, spaceShip.TIME_SLICE); //old one
+            double vDot = solvers.rungaKutta4thOrder(t,1,spaceShip.TIME_SLICE, velocity.getZ());
             double ty = Math.sqrt((spaceShip.coordinates.getZ() - tempLocation.getZ())/vDot);
             velocity.setZ(tempVelocity.getZ() + velocity.getZ()*ty);
             spaceShip.coordinates.setZ(spaceShip.coordinates.getZ() + tempVelocity.getZ()*ty + vDot*ty*ty/2);
@@ -59,8 +68,14 @@ public class ClosedLoopV2 {
             if(spaceShip.coordinates.getX() <= 0.1 && spaceShip.coordinates.getX() >= -0.1 && spaceShip.coordinates.getZ() <= 0.02 && spaceShip.coordinates.getZ() >= -0.02) {
                 //fully rotated
                 thurster.setX(g / Math.cos(spaceShip.coordinates.getZ()));
-                spaceShip.coordinates.setY(thurster.getX() * Math.cos(spaceShip.coordinates.getZ()) - g);
-                coordinatesList.add(spaceShip.coordinates.copy());
+                //would normally correct but for now -> don't use thrust in these coordinates
+                while (spaceShip.coordinates.y > 0) {
+                	spaceShip.coordinates.y = spaceShip.coordinates.y + 0.5 * spaceShip.TIME_SLICE * spaceShip.TIME_SLICE * Math.cos(spaceShip.coordinates.getZ() - g) + spaceShip.TIME_SLICE - spaceShip.getVelocity().y;
+                	spaceShip.velocity.y = spaceShip.velocity.y + (Math.cos(spaceShip.coordinates.getZ() - g)) * spaceShip.TIME_SLICE;
+                	//spaceShip.coordinates.setY(thurster.getX() * Math.cos(spaceShip.coordinates.getZ()) - g);
+                	coordinatesList.add(spaceShip.coordinates.copy());
+                	t = t+ 0.1;
+                }
                 t += 0.1;
                 totalTime = t;
                 coordinatesList.add(spaceShip.coordinates.copy());
@@ -109,12 +124,18 @@ public class ClosedLoopV2 {
         return t;
     }
 
-
+    /*
+     * There is another class for ODE Solvers now, in the Land package
+     * 
+     * 
+     * 
     //velocity dot for half rotation.
     public static double vDot(double y,double t){
         return ((y-velocity.getZ())/t); //t*t
     }
 
+    
+    //
     //solvers
     //https://www.geeksforgeeks.org/euler-method-solving-differential-equation/
     public static double euler(double x0, double y, double h, double x) {
@@ -151,8 +172,8 @@ public class ClosedLoopV2 {
         }
 
         return y;
-    }
-
+    }*/
+    /*
     public static void main(String args[]) {
         //ArrayList<Vector3D> s = storeCoordinate();
 
@@ -165,4 +186,5 @@ public class ClosedLoopV2 {
             System.out.println("z = " + temp.getZ());
         }
     }
+    */
 }

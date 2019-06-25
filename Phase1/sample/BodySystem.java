@@ -110,6 +110,7 @@ public class BodySystem {
         return timeSlice;
         }*/
 
+    //the next two methods are similar to the ones in the body, and are used to calculate the location and the velocity used when there is an already calculated acceleration
     public void findVelocity(double timeSlice) {
     	for (int i = 0; i < this.bodies.size(); i++) {
     		this.bodies.get(i).calcAcc(this.bodies, timeSlice);

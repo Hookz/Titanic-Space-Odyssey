@@ -129,7 +129,7 @@ public class OpenLoopV4 {
 		ArrayList<Double> windspeeds = wind.calculateForcesForWholeTraject(spaceship, spaceship.getYLocation());
 	}
 	
-	//such that, as the update methods runs through a while loop, the timestamps will be okay
+	//such that, as the update methods runs through a while loop, the time stamps will be okay
 	public void adjustTime() { 
 		timeToCorrectThetaFirst = this.timeToCorrectThetaFirst;
 		timeToCorrectThetaFirstVelocity = this.timeToCorrectThetaFirstVelocity + this.timeToCorrectThetaFirst;
@@ -285,7 +285,7 @@ public class OpenLoopV4 {
 	
 	//speeds up until x has reaches 1/4th of the distance to point 0
 	public void correctXSpeedUp() {
-		double sNeeded = xTemp * 1/4;
+		double sNeeded = xTemp * 1/6;
 		System.out.println("needed s to travel is " + sNeeded);
 		
 		double time = 0.0001;
@@ -426,7 +426,7 @@ public class OpenLoopV4 {
 		double t = 0;
 		while (t < timeToSlowDownX) {
 			double yNow = yTemp + 0.5 * (uToSlowDownX * Math.cos(thetaTemp)-g) * t * t + yVelTemp * t;
-			double xNow = xTemp + 0.5 * t * t * uToSlowDownX  * Math.sin(thetaTemp) + t * xVelTemp * t;
+			double xNow = xTemp + 0.5 * t * t * uToSlowDownX  * Math.sin(thetaTemp) + xVelTemp * t;
 			estimatedLocations.add(new Vector2D(xNow, yNow));
 			t = t + 0.1;
 		}
