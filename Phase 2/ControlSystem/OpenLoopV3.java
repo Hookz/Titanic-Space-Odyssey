@@ -2,14 +2,12 @@ package ControlSystem;
 
 public class OpenLoopV3 {
     public static void main(String[] main) {
-        //Vector2D thruster = new Vector2D(0,0); //x is u, y is v
     	
         System.out.println("initial x loc is " + spaceShip.getCoordinates().x);
         System.out.println("initial y loc is " + spaceShip.getCoordinates().y);
 
         double freeFall = timeOnFreeFall(velocity.y, spaceShip.getCoordinates().y);
         System.out.println("time on free fall: " + freeFall);
-        //double timePassed = 0;
 
         //temp for old velocity and location
         Vector3D tempLocation = spaceShip.coordinates;
@@ -64,6 +62,7 @@ public class OpenLoopV3 {
         return t;
     }
 
+    //Controller for z
     public static void ZControl(Vector3D tempCoordinate, Vector3D tempVelocity, double timeOnFreeFall) {
     	ODESolvers solver = new ODESolvers(spaceShip);
     	
@@ -80,6 +79,7 @@ public class OpenLoopV3 {
         System.out.println("T new z: " + spaceShip.coordinates.z);
     }
 
+    //Controller for y
     public static void YControl(){
         System.out.println("T velocity y: " + velocity.y);
         //fully rotated
@@ -90,6 +90,7 @@ public class OpenLoopV3 {
         System.out.println("T new y: " + spaceShip.coordinates.y);
     }
 
+    //Controller for x
     public static void XControl(Vector3D tempCoordinate) {
         System.out.println("T velocity x: " + velocity.x);
         double t = 2 * (tempCoordinate.x) / velocity.x; //use this as time
