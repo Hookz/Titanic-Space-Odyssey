@@ -1,4 +1,9 @@
 package ControlSystem;
+/*
+ * A class that solves ODE's - can use four different ones, depending on which you choose.
+ * Equation to be solved is in the velocity method.
+ * The velocity method can be changed - depending on which equation needs to be solved.
+ */
 
 public class ODESolvers {
 	private static SpaceShip spaceShip;

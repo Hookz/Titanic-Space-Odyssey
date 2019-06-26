@@ -1,4 +1,7 @@
 package Land;
+/*
+ * A stochastic model of wind, used to calculate wind speeds, displacement by wind and tilt by wind.
+ */
 
 import java.util.ArrayList;
 

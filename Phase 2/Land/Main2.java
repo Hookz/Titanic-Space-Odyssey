@@ -1,6 +1,5 @@
 package Land;
 
-
 	import java.text.DecimalFormat;
 	import java.util.ArrayList;
 	import javafx.animation.KeyFrame;
@@ -26,6 +25,11 @@ package Land;
 	import ControlSystem.Vector2D;
 	import OpenLoopAgain.OpenLoopV4;
 	import ControlSystem.SpaceShip;
+	
+	/*
+	 * Can show different methods to land on Titan - even when only the wind is working.
+	 * Currently works with the open loop, doesn't use wind.
+	 */
 	
 	public class Main2 extends Application {
 		
@@ -195,15 +199,15 @@ package Land;
 	        fpsLabel.setText("FPS: " + fps.countFrame());
 	        DecimalFormat numberFormat = new DecimalFormat("#0.00"); 
 	        
-	        velocityLabelX.setText("Velocity x = " + spaceShip.getVelocity().getX());
-	        velocityLabelY.setText("Velocity y = " + spaceShip.getVelocity().getY());
+	       // velocityLabelX.setText("Velocity x = " + spaceShip.getVelocity().getX());
+	       // velocityLabelY.setText("Velocity y = " + spaceShip.getVelocity().getY());
 	        locationLabelX.setText("Location x = " + numberFormat.format(spaceShip.getLocation().getX() / 1000) + " km away from goal");
 	        locationLabelY.setText("Location y = " + numberFormat.format((spaceShip.getLocation().y)/ 1000) + " km away from goal");
 	    }
 	    
 	    private void createSpaceship() {
 	    	//arbitrary numbers:
-	    	Vector2D spaceshipLoc = new ControlSystem.Vector2D(5000, 300*1000); //the location of the upper left corner of the spaceShip - it's 400 km away from Titan
+	    	Vector2D spaceshipLoc = new ControlSystem.Vector2D(50000, 300*1000); //the location of the upper left corner of the spaceShip - it's 400 km away from Titan
 	    	double length = 17; //in m
 	    	double width = 4.5; //in m
 	    	
@@ -231,7 +235,7 @@ package Land;
 	        
 	        Canvas canvas = new Canvas();//createCanvas();
 	        border.setCenter(canvas);
-	        stage.setTitle("Moon Lander");
+	        stage.setTitle("Moon lander - open loop");
 	        Scene scene = new Scene(border);
 	        stage.setScene(scene);
 	        stage.setMaximized(true);

@@ -30,6 +30,7 @@ public class LunarLanderLaunch {
 	private double theta = 0;
 	private double thetaVel = 0;
 	
+	
 	public LunarLanderLaunch(Vector2D desiredLoc, SpaceShip spaceship, double timeStep) {
 		this.locationNeeded = desiredLoc;
 		this.spaceship = spaceship;
@@ -63,7 +64,9 @@ public class LunarLanderLaunch {
 		System.out.println(sNeeded);
 		System.out.println(velFinal);
 		
-		while (tempLoc.y < sSpeedUp - 100){
+		
+		//store the locations in an arraylist
+		while (tempLoc.y < sSpeedUp){
 			tempLoc.y = 0.5 * timePassed * timePassed * (SpaceShip.GRAV_TITAN);
 			tempVeloc.y = timePassed * (SpaceShip.GRAV_TITAN);
 			
@@ -354,14 +357,6 @@ public class LunarLanderLaunch {
 		System.out.println();
 		
 		
-		/*while (tempLoc.y < (locationNeeded.y - 100)) {
-			tempLoc.y = tempLoc.y + tempVeloc.y * timeStep +  0.5 * timeStep * timeStep * (-SpaceShip.GRAV_TITAN);
-			tempVeloc.y = tempVeloc.y + timeStep * (-SpaceShip.GRAV_TITAN);
-			
-			locations.add(tempLoc.copy());
-			timePassed = timePassed +  timeStep;
-		}*/
-		
 		timeTemp = timePassed;
 		storeYVel = tempVeloc.y;
 		timeNow = timeStep;
@@ -373,11 +368,8 @@ public class LunarLanderLaunch {
 			locations.add(tempLoc.copy());
 			timePassed = timePassed +  timeStep;
 			timeNow = timeNow + timeStep;
-			//System.out.println(tempLoc.y);
-			//System.out.println(tempVeloc.y);
-		}
+		 }
 		
-		System.out.println("done");
 		System.out.println("y after this correction is " + tempLoc.y);
 		System.out.println("y vel after this correction is " + tempVeloc.y);
 	}

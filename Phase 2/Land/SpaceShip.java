@@ -1,5 +1,11 @@
 package Land;
 
+/*
+ * A class to keep track of the location, velocity, acceleration, tilt, etc of the lunar lander.
+ * Can also calculate these properties for different situations, such as gravity, wind and thrust.
+ * Connected to the wind.
+ */
+
 import ControlSystem.Vector2D;
 import ControlSystem.Wind;
 

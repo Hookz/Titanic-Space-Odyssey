@@ -1,5 +1,10 @@
 package Land;
 
+/*
+ * The same one as the class in the Phase1/sample package.
+ * 
+ */
+
 
 public class FPSCounter {
     private long startTime = 0;
