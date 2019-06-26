@@ -5,9 +5,6 @@ Maybe use float to gain better accuracy and convert it to double if we still wan
 
 package sample;
 
-//TODO Take advantage of celestistial body to see it could be used for rocket by using high rocket launch.
-//TODO make an algorithm to compute missle trajectory.
-//TODO make button change TIME_Slice for pause button
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -89,6 +86,7 @@ public class Main extends Application {
         stage.show();
     }
 
+    //uses location after updated in the BodySystem calculation.
     protected void updateFrame(GraphicsContext gc) {
         this.canvasWidth = gc.getCanvas().getWidth();
         this.canvasHeight = gc.getCanvas().getHeight();

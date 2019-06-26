@@ -1,16 +1,7 @@
 package sample;
 
-
-import java.sql.Time;
-//TODO
 /**
- * info for adding to GUI:
- * time of launch from EarthToTitan and TitanToEarth given by Trajectory.launchToTitan and Trajectory.launchToEarth, respectively
- * both above given in seconds and are public in Trajectory class
- * elapsedSeconds in main or of current bodysystem gives time of the system.
- * IDEA: while time is between launch and land use calculateVelocityFromThrust
- * POSSIBLE ISSUE: Velocity does not reach 0 when approaching titan(doesn't slow down at all)
- * POSSIBLE ISSUE: overlap with land on titan and launch from titan times as they follow each other instantly
+ * Rocket Model is depreciated.
  */
 public class RocketModel {
     public static final double MASS_EMPTY =100000; //mass w/out fuel kg

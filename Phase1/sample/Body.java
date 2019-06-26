@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Body {
+    //Store positions, velocity and acceleration of Space object
     public Vector3D location;
     public Vector3D velocity;
     public Vector3D acceleration;
 
-    // miss is in kg
+    // mass is in kg
     public double mass;
 
     //radius
@@ -99,7 +100,7 @@ public class Body {
 
         return grativationalForce;
     }
-    
+
      //does not use runga kutta
     //calculates the last of the accumilated velocity.
     protected void updateVelocity(double timeSlice) {

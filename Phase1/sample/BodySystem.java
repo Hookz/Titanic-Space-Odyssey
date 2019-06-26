@@ -27,6 +27,7 @@ public class BodySystem {
         this.bodies.add(body);
     }
 
+    //Calculation for Force, acceleration, velocity and new location.
     public double update(double timeSlice) {
         // reset acceleration so we can accumulate acceleration due to gravitation from all this.bodies
         this.bodies.stream().forEach(i -> i.resetAcceleration()) ;
