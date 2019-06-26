@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.ScrollEvent;
@@ -35,6 +36,7 @@ public class Main extends Application {
 	private SolarSystem solarS;
 	private Scene scene;
 	private SubScene subScene;
+	private boolean change = false;
 	
 	
 	public void start(Stage primaryStage) throws Exception{
@@ -45,20 +47,47 @@ public class Main extends Application {
 		Group group = createGroup();
 		
 		
-		subScene = new SubScene(group, Scaling.WIDTH - 100, Scaling.HEIGHT, true, SceneAntialiasing.BALANCED);
+		subScene = new SubScene(group, Scaling.WIDTH - 300, Scaling.HEIGHT, true, SceneAntialiasing.BALANCED);
 	    subScene.setCamera(camera);
 	    createSubScene();
 	    
 	    // 2D
 	    BorderPane pane = new BorderPane();
+	    
+	    
 	    Button playPause = new Button("\u25B6");
-	    Button forward6Button = new Button("\u25B6\u25B6");
-	    Button forward12Button = new Button("\u25B6\u25B6\u25B6");
-	    ToolBar toolBar = new ToolBar(playPause,forward6Button,forward12Button);
-	    toolBar.setOrientation(Orientation.VERTICAL);
+	    //Button forward6Button = new Button("\u25B6\u25B6");
+	    //Button forward12Button = new Button("\u25B6\u25B6\u25B6");
+	    //ToolBar toolBar = new ToolBar(playPause,forward6Button,forward12Button);
+	    
+	    playPause.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                if (change) {
+                    change = false;
+                }
+                else {
+                    change = true;
+                }
+            }
+        });
+	    
+	    
+	    Label instructionLabelOne = new Label("Y - rotate y: 10 degrees");
+	    Label instructionLabelTwo = new Label("H - rotate y: -10 degrees");
+	    Label instructionLabelThree = new Label("X - rotate x: 10 degrees");
+	    Label instructionLabelFour = new Label("S - rotate x: -10 degrees");
+	    Label instructionLabelFive = new Label("Z - rotate z: 10 degrees");
+	    Label instructionLabelSix = new Label("A - rotate z: - 10 degrees");
+	    Label instructionLabelSeven = new Label("Scroll - move in z direction");
+	    Label instructionLabelEight = new Label("Drag - move in x and y direction");
+	    Label timeLabel = new Label("Time");
+	   
+	    ToolBar toolbar = new ToolBar(playPause,instructionLabelOne, instructionLabelTwo, instructionLabelThree, instructionLabelFour, instructionLabelFive, instructionLabelSix, instructionLabelSeven, instructionLabelEight, timeLabel);
+	    toolbar.setOrientation(Orientation.VERTICAL);
+	    toolbar.setPrefWidth(300);
 	    pane.setCenter(subScene);
 	    pane.setPrefSize(300,300);
-	    pane.setRight(toolBar);
+	    pane.setRight(toolbar);
 	    
 	    scene = new Scene(pane, Scaling.WIDTH, Scaling.HEIGHT);
 	    
@@ -72,21 +101,28 @@ public class Main extends Application {
 		
 		primaryStage.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
 			   switch (event.getCode()) {
-			   	case D:
+			   	case Y:
 			   		camera.getTransforms().add(new Rotate(10, Rotate.Y_AXIS));
 			   		break;
 			   
-			   	case A:
+			   	case H:
 			   		camera.getTransforms().add(new Rotate(-10, Rotate.Y_AXIS));
 			   		break;
 			   
-			   	case S:
+			   	case X:
 			   		camera.getTransforms().add(new Rotate(-10, Rotate.X_AXIS));
 			   		break;
 				   
-			   	case W:
+			   	case S:
 			   		camera.getTransforms().add(new Rotate(10, Rotate.X_AXIS));
 			   		break;
+			   		
+			   	case Z:
+			   		camera.getTransforms().add(new Rotate(10, Rotate.Z_AXIS));
+			   		break;
+			   		
+			   	case A:
+			   		camera.getTransforms().add(new Rotate(-0, Rotate.Z_AXIS));
 			   }
 	  	});
 		
@@ -96,7 +132,10 @@ public class Main extends Application {
                 Duration.millis(0.1),
                 new EventHandler<ActionEvent>() {
                     public void handle(ActionEvent ae) {
-                        solarS.update(TIME_SLICE);
+                        if (change) {
+                        	solarS.update(TIME_SLICE);
+                        	timeLabel.setText(solarS.getElapsedTimeAsString());
+                        }
                     }
                 });
         timeline.getKeyFrames().add(kf);
