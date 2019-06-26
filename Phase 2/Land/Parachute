@@ -1,0 +1,10 @@
+package Land;
+
+public class Parachute {
+    //Call this method if the distance to earth's surface is 3.5 km or less
+    public void openParachute(SpaceShip s){
+        //in meters per second
+        s.velocity.y = 9.7;
+    }
+    //Important to not use closed or open loop anymore, just let the spaceship fall the remainder of the distance
+}
