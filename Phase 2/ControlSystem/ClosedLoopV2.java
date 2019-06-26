@@ -2,6 +2,7 @@ package ControlSystem;
 
 import java.util.ArrayList;
 
+//main Closed Loop controller
 public class ClosedLoopV2 {
     public static Vector3D velocity = new Vector3D(0.1,0.1,0.1);
     public static Vector2D thurster = new Vector2D();
@@ -18,7 +19,8 @@ public class ClosedLoopV2 {
     	this.solvers = new ODESolvers(spaceship);
 
     }
-    
+
+    //Closed Loop Controller.   Stores calculate coordinate at a Arraylist which it returns.
     public static ArrayList<Vector3D> storeCoordinate() {
         ArrayList<Vector3D> coordinatesList = new ArrayList<>();
         Vector2D thruster = new Vector2D(0,0); //x is u, y is v
@@ -102,6 +104,7 @@ public class ClosedLoopV2 {
 
     }
 
+    //Help to restart Conterller if it does not have a safety landing.
     public static void helperClosedLoop() {
         ArrayList<Vector3D> s = storeCoordinate();
         if(landed) {
