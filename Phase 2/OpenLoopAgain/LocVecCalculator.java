@@ -1,7 +1,9 @@
 package OpenLoopAgain;
+//can be used to calculate different values according to data - currently not used
+
 
 public class LocVecCalculator {
-	//can be used to calculate different values according to data
+	
 	public double calculateTimeWhenSlowingDownWithConstantAcc(double needed, double veloc) {
 		return needed / (0.5 * veloc);
 	}

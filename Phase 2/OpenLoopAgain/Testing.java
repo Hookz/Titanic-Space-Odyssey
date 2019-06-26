@@ -7,9 +7,7 @@ import Land.LunarLanderLaunch;
 import Land.SpaceShip;
 
 /* Perform tests for the OpenLoopV4 class
- * As there were differences found between the stored values in 
- * 
- * 
+ * Results and explanation of method of testing is in the report in the experiments section
  */
 
 public class Testing {
