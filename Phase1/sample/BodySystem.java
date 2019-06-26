@@ -114,7 +114,7 @@ public class BodySystem {
     public void findVelocity(double timeSlice) {
     	for (int i = 0; i < this.bodies.size(); i++) {
     		this.bodies.get(i).calcAcc(this.bodies, timeSlice);
-    		System.out.println(this.bodies.get(i).acceleration);
+    		//System.out.println(this.bodies.get(i).acceleration);
     		this.bodies.get(i).velocity.x = this.bodies.get(i).velocity.x + this.bodies.get(i).acceleration.x * timeSlice;
     		this.bodies.get(i).velocity.y = this.bodies.get(i).velocity.y + this.bodies.get(i).acceleration.y * timeSlice;
     		this.bodies.get(i).velocity.z = this.bodies.get(i).velocity.z + this.bodies.get(i).acceleration.z * timeSlice;
