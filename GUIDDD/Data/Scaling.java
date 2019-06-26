@@ -1,5 +1,8 @@
 package Data;
 
+/*
+ * Provides scales needed for the GUI in 3D
+ */
 public class Scaling {
 	public final static int WIDTH = 1500;
 	public final static int HEIGHT = 1000;

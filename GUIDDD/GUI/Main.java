@@ -27,6 +27,13 @@ import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+
+/*
+ * Displays the GUI in 3D, with a 2D component to show the controls.
+ * The sun emits light, so it's possible to see which side of which planet is aimed at the sun.
+ * 
+ */
+
 public class Main extends Application {
 	public final double TIME_SLICE = 200;
 	private double locX;

@@ -2,6 +2,10 @@ package Data;
 
 import GUI.*;
 
+/*
+ * Same class as the one in the Phase1/sample package.
+ */
+
 public enum SpaceObject {
 
     //ephemerides coordinate taken from https://ssd.jpl.nasa.gov/horizons.cgi#results.

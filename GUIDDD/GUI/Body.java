@@ -2,6 +2,11 @@ package GUI;
 
 import Data.Physics;
 
+/*
+ * Body class especially for the GUI in 3D, this class does not have the implementation for RK4, that one is in the ControlSystem.
+ */
+
+
 public class Body {
     public Vector3D location;
     public Vector3D velocity;

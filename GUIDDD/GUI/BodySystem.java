@@ -7,6 +7,10 @@ import java.util.Optional;
 import Data.Scaling;
 import javafx.scene.shape.Sphere;
 
+/*
+ * Different class than the one in the ControlSystem, this one doesn't have implementation for the RK4.
+ */
+
 public class BodySystem {
     private static final int SEC_IN_MINUTE = 60;
     private static final int SEC_IN_HOUR = SEC_IN_MINUTE * 60;

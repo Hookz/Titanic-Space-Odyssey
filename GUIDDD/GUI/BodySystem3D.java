@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import javafx.scene.shape.Sphere;
 
+/*
+ * This class turns the bodySystem into another one made of spheres, which will provide an arraylist of spheres.
+ * This arraylist can be used to display the gui in 3D.
+ */
 
 public class BodySystem3D {
 	private List<Sphere> solarSystem = new ArrayList<Sphere>();

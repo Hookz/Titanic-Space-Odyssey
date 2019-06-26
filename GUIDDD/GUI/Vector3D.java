@@ -1,5 +1,9 @@
 package GUI;
 
+/*
+ * The same class as the one in Phase1.
+ */
+
 public class Vector3D {
     public double x;
     public double y;

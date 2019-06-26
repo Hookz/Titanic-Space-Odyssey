@@ -6,6 +6,9 @@ import Data.SpaceObject;
 
 import static Data.SpaceObject.*;
 
+/*
+ * The same class as the one in the Phase1/sample package
+ */
 
 public class SolarSystem extends BodySystem {
 
